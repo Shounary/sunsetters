@@ -7,6 +7,12 @@ specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
 
+export const storage = defineStorage({
+  name: "user-images",
+  access: (allow) => ({
+    "images/*": [allow.authenticated.to(["read", "write", "delete"])],
+  })
+});
 
 const schema = a.schema({
   Post: a
@@ -32,12 +38,6 @@ export const data = defineData({
   },
 });
 
-export const storage = defineStorage({
-  name: "user-images",
-  access: (allow) => ({
-    "images/*": [allow.authenticated.to(["read", "write", "delete"])],
-  })
-});
 
 /*== STEP 2 ===============================================================
 Go to your frontend source code. From your client-side code, generate a
