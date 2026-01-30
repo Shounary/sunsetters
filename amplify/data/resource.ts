@@ -1,4 +1,4 @@
-import { type ClientSchema, a, defineData, defineStorage } from "@aws-amplify/backend";
+import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -7,12 +7,6 @@ specifies that any user authenticated via an API key can "create", "read",
 "update", and "delete" any "Todo" records.
 =========================================================================*/
 
-export const storage = defineStorage({
-  name: "user-images",
-  access: (allow) => ({
-    "images/*": [allow.authenticated.to(["read", "write", "delete"])],
-  })
-});
 
 const schema = a.schema({
   Post: a
