@@ -1,14 +1,21 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { uploadData } from "aws-amplify/storage";
+import { getUrl, uploadData } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
+import { PostDisplay } from "./DisplayTypes";
 
 const client = generateClient<Schema>();
 
+async function fetchPostFeed() {
+    const { data: feedPosts } = await client.models.Post.list()
+    return feedPosts
+}
+
 function App() {
     const [file, setFile] = useState<File | null>(null);
-    const [posts, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
+    const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
+    const [feedDislay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const { user, signOut } = useAuthenticator()
 
 
@@ -56,15 +63,27 @@ function App() {
         })
     }
 
-    // const getImageURL = (imagePath: string) => {
-    //     return getUrl({ path: imagePath })
-    // }
+    const fetchExtratedFeed = async () => {
+        const postFeed = await fetchPostFeed()
+        postFeed.forEach(async post => {
+            if (!post.imagePath) return
+            const imageURL = await getUrl({ path: post.imagePath })
+            const postDisplay: PostDisplay = {
+                id: post.id,
+                content: post.content ?? "",
+                mediaURLs: [imageURL.url]
+            }
+            setFeedDisplay((prev) => [...prev, postDisplay])
+        });
+    }
 
     useEffect(() => {
         client.models.Post.observeQuery().subscribe({
             next: (post) => setPosts([...post.items]),
-        });
-    }, []);
+        })
+
+        fetchExtratedFeed()
+    }, [])
 
     return (
         <main>
@@ -78,10 +97,15 @@ function App() {
             </div>
 
             <ul>
-                {posts.map((post) => (<li
-                    // onClick={() => deleteTodo(todo.id)}
-                    key={post.id}>
-                    {post.imagePath ?? "***missing***"}
+                {feedDislay.map((displayPost) => (<li
+                    key={displayPost.id}>
+                    <div className="image-container">
+                        <img 
+                            src={displayPost.mediaURLs[0].toString()} 
+                            // alt={displayPost.mediaURLs[0].toString()} 
+                            style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
+                        />
+                    </div>
                 </li>
                 ))}
             </ul>
