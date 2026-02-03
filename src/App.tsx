@@ -14,7 +14,7 @@ async function fetchPostFeed() {
 
 function App() {
     const [file, setFile] = useState<File | null>(null);
-    const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
+    // const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const { user, signOut } = useAuthenticator()
 
@@ -96,10 +96,6 @@ function App() {
     }
 
     useEffect(() => {
-        client.models.Post.observeQuery().subscribe({
-            next: (post) => setPosts([...post.items]),
-        })
-
         client.models.Post.observeQuery().subscribe({
             next: () => fetchExtratedFeed(),
         })
