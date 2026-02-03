@@ -99,8 +99,6 @@ function App() {
         client.models.Post.observeQuery().subscribe({
             next: () => fetchExtratedFeed(),
         })
-
-        fetchExtratedFeed()
     }, [])
 
     return (
