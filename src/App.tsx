@@ -82,7 +82,9 @@ function App() {
             next: (post) => setPosts([...post.items]),
         })
 
-        fetchExtratedFeed()
+        client.models.Post.observeQuery().subscribe({
+            next: () => fetchExtratedFeed(),
+        })
     }, [])
 
     return (
@@ -102,7 +104,7 @@ function App() {
                     <div className="image-container">
                         <img 
                             src={displayPost.mediaURLs[0].toString()} 
-                            // alt={displayPost.mediaURLs[0].toString()} 
+                            alt={displayPost.mediaURLs[0].toString()} 
                             style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
                         />
                     </div>
