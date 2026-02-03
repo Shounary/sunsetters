@@ -84,6 +84,7 @@ function App() {
     const fetchExtratedFeed = async () => {
         const postFeed = await fetchPostFeed()
         postFeed.forEach(async post => {
+            setFeedDisplay(() => [])
             if (!post.imagePath) return
             const imageURL = await getUrl({ path: post.imagePath })
             const postDisplay: PostDisplay = {
