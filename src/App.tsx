@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getUrl, uploadData } from "aws-amplify/storage";
+import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay } from "./DisplayTypes";
 
@@ -14,8 +14,8 @@ async function fetchPostFeed() {
 
 function App() {
     const [file, setFile] = useState<File | null>(null);
-    const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
-    const [feedDislay, setFeedDisplay] = useState<Array<PostDisplay>>([])
+    // const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
+    const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const { user, signOut } = useAuthenticator()
 
 
@@ -65,15 +65,26 @@ function App() {
         })
     }
 
-    // const deletePost = () => {
 
-    // }
+    // DELETE POST
+    const deletePost = (id: string) => {
+        client.models.Post.get({ id: id }).then((post) => {
+            if (!post || !post.data?.imagePath) {
+               console.warn(`Could not find post with id ${id} to delete!`)
+               return
+            }
+            client.models.Post.delete({ id: id })
+            setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
+            remove({ path: post.data?.imagePath })
+        })
+    }
 
 
     // FEED DISPLAY
     const fetchExtratedFeed = async () => {
         const postFeed = await fetchPostFeed()
         postFeed.forEach(async post => {
+            setFeedDisplay(() => [])
             if (!post.imagePath) return
             const imageURL = await getUrl({ path: post.imagePath })
             const postDisplay: PostDisplay = {
@@ -86,10 +97,6 @@ function App() {
     }
 
     useEffect(() => {
-        client.models.Post.observeQuery().subscribe({
-            next: (post) => setPosts([...post.items]),
-        })
-
         client.models.Post.observeQuery().subscribe({
             next: () => fetchExtratedFeed(),
         })
@@ -107,7 +114,8 @@ function App() {
             </div>
 
             <ul>
-                {feedDislay.map((displayPost) => (<li
+                {feedDisplay.map((displayPost) => (<li
+                    onClick={() => deletePost(displayPost.id)}
                     key={displayPost.id}>
                     <div className="image-container">
                         <img 
