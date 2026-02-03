@@ -1,48 +1,124 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
+import { getUrl, uploadData } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
+import { PostDisplay } from "./DisplayTypes";
 
 const client = generateClient<Schema>();
 
+async function fetchPostFeed() {
+    const { data: feedPosts } = await client.models.Post.list()
+    return feedPosts
+}
+
 function App() {
-    const [todos, setTodos] = useState<Array<Schema["Todo"]["type"]>>([]);
+    const [file, setFile] = useState<File | null>(null);
+    const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
+    const [feedDislay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const { user, signOut } = useAuthenticator()
 
-    useEffect(() => {
-        client.models.Todo.observeQuery().subscribe({
-            next: (data) => setTodos([...data.items]),
+
+    // FILE UPLOAD
+    const handleFileChange = (f: any) => {
+        // files is an array-like object; we want the first one
+        setFile(f.target.files[0]);
+    };
+
+    const handleUpload = () => {
+        if (!file) return;
+        console.log("Uploading:", file.name);
+        // Logic to send file to server goes here
+
+        // CREATE A POST
+        // Create a dud post
+        client.models.Post.create({
+            // timestamp: new Date().getUTCDate().toString()
+            content: "Created a static test post with custom image"
+        }).then((post) => {
+            if (!post.data) {
+                console.warn("Post contains empty data!");
+                return
+            }
+            console.log(`File ${file.name} selected`)
+            const postData = post.data
+
+            // Upload image to S3 storage
+            uploadData({
+                path: `images/${post.data.id}-${file.name}`,
+                data: file,
+                options: {
+                    contentType: "image/png"
+                }
+            }).result.then((uploaded) => {
+                console.log(`Image ${uploaded.path} uploaded to storage`)
+
+                // Update the dud post with S3 path
+                client.models.Post.update({
+                    id: postData.id,
+                    content: postData.content,
+                    imagePath: uploaded.path
+                }).then(() => {
+                    console.log(`Post for ${file.name} update with newly uploaded image ${uploaded.path}`)
+                })
+            })
+        })
+    }
+
+    // const deletePost = () => {
+
+    // }
+
+
+    // FEED DISPLAY
+    const fetchExtratedFeed = async () => {
+        const postFeed = await fetchPostFeed()
+        postFeed.forEach(async post => {
+            if (!post.imagePath) return
+            const imageURL = await getUrl({ path: post.imagePath })
+            const postDisplay: PostDisplay = {
+                id: post.id,
+                content: post.content ?? "",
+                mediaURLs: [imageURL.url]
+            }
+            setFeedDisplay((prev) => [...prev, postDisplay])
         });
-    }, []);
-
-    function createTodo() {
-        client.models.Todo.create({ content: window.prompt("Todo content") });
     }
 
-    function deleteTodo(id: string) {
-        client.models.Todo.delete({ id: id })
-    }
+    useEffect(() => {
+        client.models.Post.observeQuery().subscribe({
+            next: (post) => setPosts([...post.items]),
+        })
+
+        client.models.Post.observeQuery().subscribe({
+            next: () => fetchExtratedFeed(),
+        })
+    }, [])
 
     return (
         <main>
-            <h1>{user?.signInDetails?.loginId}'s todos</h1>
-            <button onClick={createTodo}>+ new</button>
+            <h1>Welcome {user?.signInDetails?.loginId}</h1>
+            <button onClick={ signOut }>SIGN OUT</button>
+
+            <div className="upload-container">
+                <input type="file" onChange={handleFileChange} />
+                <button onClick={handleUpload}>Upload</button>
+                {file && <p>Selected: {file.name}</p>}
+            </div>
+
             <ul>
-                {todos.map((todo) => (<li
-                    onClick={() => deleteTodo(todo.id)}
-                    key={todo.id}>
-                    {todo.content}
+                {feedDislay.map((displayPost) => (<li
+                    key={displayPost.id}>
+                    <div className="image-container">
+                        <img 
+                            src={displayPost.mediaURLs[0].toString()} 
+                            alt={displayPost.mediaURLs[0].toString()} 
+                            style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
+                        />
+                    </div>
                 </li>
                 ))}
             </ul>
-            <button onClick={ signOut }>SIGN OUT</button>
-            <div>
-                🥳 App successfully hosted. Try creating a new todo.
-                <br />
-                <a href="https://docs.amplify.aws/react/start/quickstart/#make-frontend-updates">
-                    Review next step of this tutorial.
-                </a>
-            </div>
         </main>
     );
 }
