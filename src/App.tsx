@@ -15,7 +15,7 @@ async function fetchPostFeed() {
 function App() {
     const [file, setFile] = useState<File | null>(null);
     const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
-    const [feedDislay, setFeedDisplay] = useState<Array<PostDisplay>>([])
+    const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const { user, signOut } = useAuthenticator()
 
 
@@ -73,8 +73,9 @@ function App() {
                console.warn(`Could not find post with id ${id} to delete!`)
                return
             }
-            remove({ path: post.data?.imagePath })
             client.models.Post.delete({ id: id })
+            setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
+            remove({ path: post.data?.imagePath })
         })
     }
 
@@ -102,6 +103,8 @@ function App() {
         client.models.Post.observeQuery().subscribe({
             next: () => fetchExtratedFeed(),
         })
+
+        fetchExtratedFeed()
     }, [])
 
     return (
@@ -116,7 +119,7 @@ function App() {
             </div>
 
             <ul>
-                {feedDislay.map((displayPost) => (<li
+                {feedDisplay.map((displayPost) => (<li
                     onClick={() => deletePost(displayPost.id)}
                     key={displayPost.id}>
                     <div className="image-container">
