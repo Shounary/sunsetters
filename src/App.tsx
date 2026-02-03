@@ -19,8 +19,9 @@ function App() {
     const { user, signOut } = useAuthenticator()
 
 
+    // FILE UPLOAD
     const handleFileChange = (f: any) => {
-        // files is an array-like object; we usually want the first one
+        // files is an array-like object; we want the first one
         setFile(f.target.files[0]);
     };
 
@@ -29,6 +30,7 @@ function App() {
         console.log("Uploading:", file.name);
         // Logic to send file to server goes here
 
+        // CREATE A POST
         // Create a dud post
         client.models.Post.create({
             // timestamp: new Date().getUTCDate().toString()
@@ -63,6 +65,12 @@ function App() {
         })
     }
 
+    // const deletePost = () => {
+
+    // }
+
+
+    // FEED DISPLAY
     const fetchExtratedFeed = async () => {
         const postFeed = await fetchPostFeed()
         postFeed.forEach(async post => {
