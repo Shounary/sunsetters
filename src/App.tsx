@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getUrl, uploadData } from "aws-amplify/storage";
+import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay } from "./DisplayTypes";
 
@@ -65,9 +65,18 @@ function App() {
         })
     }
 
-    // const deletePost = () => {
 
-    // }
+    // DELETE POST
+    const deletePost = (id: string) => {
+        client.models.Post.get({ id: id }).then((post) => {
+            if (!post || !post.data?.imagePath) {
+               console.warn(`Could not find post with id ${id} to delete!`)
+               return
+            }
+            remove({ path: post.data?.imagePath })
+            client.models.Post.delete({ id: id })
+        })
+    }
 
 
     // FEED DISPLAY
@@ -108,6 +117,7 @@ function App() {
 
             <ul>
                 {feedDislay.map((displayPost) => (<li
+                    onClick={() => deletePost(displayPost.id)}
                     key={displayPost.id}>
                     <div className="image-container">
                         <img 
