@@ -3,7 +3,7 @@ import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { PostDisplay } from "./DisplayTypes";
+import { PostDisplay, INewPost } from "./DisplayTypes";
 
 const client = generateClient<Schema>();
 
@@ -13,40 +13,53 @@ async function fetchPostFeed() {
 }
 
 function App() {
-    const [file, setFile] = useState<File | null>(null);
-    // const [, setPosts] = useState<Array<Schema["Post"]["type"]>>([])
+    // const [file, setFile] = useState<File | null>(null);
+    const [newPost, setNewPost] = useState<INewPost>({
+        textInput: '',
+        imageInput: null
+    })
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const { user, signOut } = useAuthenticator()
 
 
     // FILE UPLOAD
-    const handleFileChange = (f: any) => {
+    const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // files is an array-like object; we want the first one
-        setFile(f.target.files[0]);
+        const { name, value, files, type } = e.target
+        setNewPost((prev) => ({
+            ...prev,
+            [name]: type === 'file' ? (files ? files[0] : null) : value
+        }))
+        console.log(newPost.textInput)
     };
 
-    const handleUpload = () => {
-        if (!file) return;
-        console.log("Uploading:", file.name);
+    const handleUpload = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!newPost || (!newPost.imageInput && newPost.textInput == '')) return;
+        // console.log("Uploading:", new.name);
         // Logic to send file to server goes here
 
         // CREATE A POST
         // Create a dud post
         client.models.Post.create({
             // timestamp: new Date().getUTCDate().toString()
-            content: "Created a static test post with custom image"
+            content: newPost.textInput
         }).then((post) => {
             if (!post.data) {
                 console.warn("Post contains empty data!");
                 return
             }
-            console.log(`File ${file.name} selected`)
+            // console.log(`File ${file.name} selected`)
             const postData = post.data
+            if (!newPost.imageInput) {
+                console.log("The post included no media!")
+                return
+            }
 
             // Upload image to S3 storage
             uploadData({
-                path: `images/${post.data.id}-${file.name}`,
-                data: file,
+                path: `images/${post.data.id}-${newPost.imageInput.name}`,
+                data: newPost.imageInput,
                 options: {
                     contentType: "image/png"
                 }
@@ -59,7 +72,7 @@ function App() {
                     content: postData.content,
                     imagePath: uploaded.path
                 }).then(() => {
-                    console.log(`Post for ${file.name} update with newly uploaded image ${uploaded.path}`)
+                    console.log(`Post for ${newPost.imageInput?.name} update with newly uploaded image ${uploaded.path}`)
                 })
             })
         })
@@ -107,11 +120,34 @@ function App() {
             <h1>Welcome {user?.signInDetails?.loginId}</h1>
             <button onClick={ signOut }>SIGN OUT</button>
 
-            <div className="upload-container">
-                <input type="file" onChange={handleFileChange} />
+            <form onSubmit={handleUpload}>
+                <div>
+                    <label>Text:</label>
+                    <input 
+                        type="text" 
+                        name="textInput"
+                        value={newPost.textInput} 
+                        onChange={handleNewPostChange} 
+                    />
+                </div>
+
+                <div>
+                    <label>Media:</label>
+                    <input 
+                        type="file" 
+                        name="imageInput" 
+                        onChange={handleNewPostChange} 
+                    />
+                </div>
+
+                <button type="submit">Post</button>
+            </form>
+
+            {/* <div className="upload-container">
+                <input type="file" onChange={handleNewPostChange} />
                 <button onClick={handleUpload}>Upload</button>
                 {file && <p>Selected: {file.name}</p>}
-            </div>
+            </div> */}
 
             <ul>
                 {feedDisplay.map((displayPost) => (<li
@@ -123,6 +159,7 @@ function App() {
                             alt={displayPost.mediaURLs[0].toString()} 
                             style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
                         />
+                        <text>{displayPost.content}</text>
                     </div>
                 </li>
                 ))}
