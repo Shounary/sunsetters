@@ -18,9 +18,10 @@ const schema = a.schema({
   })
   .authorization((allow) => [allow.owner()]),
 
-  User: a
+  UserProfile: a
   .model({
     id: a.id().required(),
+    name: a.string().required(),
     imagePath: a.string().required()
   })
 });

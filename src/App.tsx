@@ -12,13 +12,18 @@ async function fetchPostFeed() {
     return feedPosts
 }
 
+async function fetchUser(userID: string) {
+    const { data: userProfile } = await client.models.UserProfile.get({ id: userID})
+    return userProfile
+}
+
 function App() {
-    // const [file, setFile] = useState<File | null>(null);
     const [newPost, setNewPost] = useState<INewPost>({
         textInput: '',
         imageInput: null
     })
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
+    const [userProfile, setUserProfile] = useState<Schema["UserProfile"]["type"]>()
     const { user, signOut } = useAuthenticator()
 
 
@@ -113,11 +118,19 @@ function App() {
         client.models.Post.observeQuery().subscribe({
             next: () => fetchExtratedFeed(),
         })
+
+        fetchUser(user.userId).then((u) => {
+            if (!u) {
+                return
+            }
+            setUserProfile(() => u)
+        })
     }, [])
 
     return (
         <main>
             <h1>Welcome {user?.signInDetails?.loginId}</h1>
+            <h2>Image: {userProfile?.imagePath}</h2>
             <button onClick={ signOut }>SIGN OUT</button>
 
             <form onSubmit={handleUpload}>
