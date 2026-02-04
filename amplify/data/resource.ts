@@ -17,6 +17,12 @@ const schema = a.schema({
     imagePath: a.string(),
   })
   .authorization((allow) => [allow.owner()]),
+
+  User: a
+  .model({
+    id: a.id().required(),
+    imagePath: a.string().required()
+  })
 });
 
 export type Schema = ClientSchema<typeof schema>;
