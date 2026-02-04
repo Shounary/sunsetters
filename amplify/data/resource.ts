@@ -24,6 +24,7 @@ const schema = a.schema({
     name: a.string().required(),
     imagePath: a.string().required()
   })
+  .authorization((allow) => [allow.authenticated()])
 });
 
 export type Schema = ClientSchema<typeof schema>;
