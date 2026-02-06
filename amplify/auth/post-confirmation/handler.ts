@@ -12,18 +12,21 @@ Amplify.configure(resourceConfig, libraryOptions);
 const client = generateClient<Schema>();
 
 export const handler: PostConfirmationTriggerHandler = async (event) => {
-  const { sub, name } = event.request.userAttributes;
+  const { sub } = event.request.userAttributes;
 
-  try {
-    await client.models.UserProfile.create({
-      id: sub, // Use Cognito 'sub' as the DB primary key
-      name: name, 
-      imagePath: "default-profile-pictures/default-pfp1.png"
-    });   
-    console.log('Successfully created user profile and added it to USER model in GraphQL');
-  } catch (error) {
-    console.error('Error creating user profile in GraphQL:', JSON.stringify(error, null, 2));
-  }
+  await client.models.UserProfile.create({
+    id: sub, // Use Cognito 'sub' as the DB primary key
+    name: "name", 
+    imagePath: "default-profile-pictures/default-pfp1.png"
+  }).then((response) => {
+    console.log('AppSync Response:', JSON.stringify(response, null, 2));
+
+    if (response.errors) {
+      console.error('GraphQL Errors:', response.errors);
+    } else {
+      console.log('Successfully created:', response.data);
+    }
+  });
 
   return event;
 };
