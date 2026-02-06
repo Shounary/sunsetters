@@ -4,26 +4,23 @@ import { generateClient } from "aws-amplify/data";
 import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost } from "./DisplayTypes";
-import { Amplify } from "aws-amplify";
-import outputs from "../amplify_outputs.json";
-
-Amplify.configure(outputs)
-const client = generateClient<Schema>();
-
-async function fetchPostFeed() {
-    const { data: feedPosts } = await client.models.Post.list()
-    return feedPosts
-}
-
-async function fetchUser(userID: string) {
-    const { data: allUsers } = await client.models.UserProfile.list()
-    console.log(`All the users: ${allUsers.length}`)
-
-    const { data: userProfile } = await client.models.UserProfile.get({ id: userID})
-    return userProfile
-}
 
 function App() {
+    const client = generateClient<Schema>();
+    async function fetchPostFeed() {
+        const { data: feedPosts } = await client.models.Post.list()
+        return feedPosts
+    }
+    
+    async function fetchUser(userID: string) {
+        const { data: allUsers } = await client.models.UserProfile.list()
+        console.log(`All the users: ${allUsers.length}`)
+    
+        const { data: userProfile } = await client.models.UserProfile.get({ id: userID})
+        return userProfile
+    }
+    
+
     const [newPost, setNewPost] = useState<INewPost>({
         textInput: '',
         imageInput: null

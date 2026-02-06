@@ -23,7 +23,8 @@ const schema = a.schema({
   .model({
     id: a.id().required(),
     name: a.string().required(),
-    imagePath: a.string().required()
+    imagePath: a.string().required(),
+    owner: a.string()
   })
   .authorization((allow) => [allow.authenticated()]),
 })
