@@ -12,14 +12,6 @@ function App() {
         return feedPosts
     }
     
-    async function fetchUser(userID: string) {
-        const { data: allUsers } = await client.models.UserProfile.list()
-        console.log(`All the users: ${allUsers.length}`)
-    
-        const { data: userProfile } = await client.models.UserProfile.get({ id: userID})
-        return userProfile
-    }
-    
 
     const [newPost, setNewPost] = useState<INewPost>({
         textInput: '',
@@ -122,16 +114,16 @@ function App() {
             next: () => fetchExtratedFeed(),
         })
 
-        console.log(`Fetching user by id: ${user.userId}`)
-
-        fetchUser(user.userId).then((u) => {
-            if (!u) {
-                console.warn(`Failed to fetch user from UserProfile model!`)
-                return
+        
+        client.models.UserProfile.observeQuery({
+            filter: { 
+                id: { eq: user.userId } 
             }
-            console.log(`Fetched user ${u.name}`)
-            console.log(`Setting current user to ${u.name}`)
-            setUserProfile(() => u)
+        }).subscribe({
+            next: ({ items }) => {
+                console.log(`Fetching user by id: ${user.userId}`)
+                setUserProfile(items[0]);
+            }
         })
     }, [])
 
@@ -164,12 +156,6 @@ function App() {
                 <button type="submit">Post</button>
             </form>
 
-            {/* <div className="upload-container">
-                <input type="file" onChange={handleNewPostChange} />
-                <button onClick={handleUpload}>Upload</button>
-                {file && <p>Selected: {file.name}</p>}
-            </div> */}
-
             <ul>
                 {feedDisplay.map((displayPost) => (<li
                     onClick={() => deletePost(displayPost.id)}
@@ -180,7 +166,7 @@ function App() {
                             alt={displayPost.mediaURLs[0].toString()} 
                             style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
                         />
-                        <text>{displayPost.content}</text>
+                        <h3>{displayPost.content}</h3>
                     </div>
                 </li>
                 ))}
