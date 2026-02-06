@@ -1,6 +1,13 @@
 import type { PostConfirmationTriggerHandler } from 'aws-lambda';
 import { generateClient } from 'aws-amplify/data';
 import { type Schema } from '../../data/resource';
+import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
+import { env } from '$amplify/env/post-confirmation';
+import { Amplify } from 'aws-amplify';
+
+
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+Amplify.configure(resourceConfig, libraryOptions);
 
 const client = generateClient<Schema>();
 
