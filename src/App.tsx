@@ -16,6 +16,9 @@ async function fetchPostFeed() {
 }
 
 async function fetchUser(userID: string) {
+    const { data: allUsers } = await client.models.UserProfile.list()
+    console.log(`All the users: ${allUsers.length}`)
+
     const { data: userProfile } = await client.models.UserProfile.get({ id: userID})
     return userProfile
 }
@@ -122,10 +125,15 @@ function App() {
             next: () => fetchExtratedFeed(),
         })
 
+        console.log(`Fetching user by id: ${user.userId}`)
+
         fetchUser(user.userId).then((u) => {
             if (!u) {
+                console.warn(`Failed to fetch user from UserProfile model!`)
                 return
             }
+            console.log(`Fetched user ${u.name}`)
+            console.log(`Setting current user to ${u.name}`)
             setUserProfile(() => u)
         })
     }, [])

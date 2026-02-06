@@ -25,9 +25,10 @@ const schema = a.schema({
     name: a.string().required(),
     imagePath: a.string().required()
   })
-  .authorization((allow) => [allow.owner()]),
+  .authorization((allow) => [allow.authenticated()]),
 })
 .authorization(allow => [
+  allow.authenticated(),
   allow.resource(postConfirmation) // <--- This triggers the env generation
 ]);
 
