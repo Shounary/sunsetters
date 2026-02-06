@@ -4,7 +4,10 @@ import { generateClient } from "aws-amplify/data";
 import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost } from "./DisplayTypes";
+import { Amplify } from "aws-amplify";
+import outputs from "../amplify_outputs.json";
 
+Amplify.configure(outputs)
 const client = generateClient<Schema>();
 
 async function fetchPostFeed() {
