@@ -3,7 +3,7 @@ import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
 import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { PostDisplay, INewPost } from "./DisplayTypes";
+import { PostDisplay, INewPost } from "./DataTypes";
 
 function App() {
     const client = generateClient<Schema>();
