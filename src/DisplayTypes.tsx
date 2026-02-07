@@ -9,8 +9,7 @@ export function AvatarImage({ imagePath }: { imagePath: string }) {
     const fetchUrl = async () => {
         console.log(`Getting URL for: ${imagePath}`)
         try {
-            const link = await getUrl({ path: ("sdf") })
-            console.log(link.url)
+            const link = await getUrl({ path: imagePath })
             setSrc(link.url.toString());
             
         } catch (err) {
