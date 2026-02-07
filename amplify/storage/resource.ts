@@ -4,6 +4,6 @@ export const storage = defineStorage({
   name: "post-storage", 
   access: (allow) => ({
     "images/*": [allow.authenticated.to(["read", "write", "delete"])],
-    "default-profile-pictures/*": [allow.authenticated.to(["read"])]
+    "default-profile-pictures/*": [allow.authenticated.to(["read", "write", "delete"])]
   }),
 });

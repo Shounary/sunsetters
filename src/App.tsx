@@ -4,6 +4,7 @@ import { generateClient } from "aws-amplify/data";
 import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost } from "./DataTypes";
+import { AvatarImage } from "./DisplayTypes";
 
 function App() {
     const client = generateClient<Schema>();
@@ -110,12 +111,12 @@ function App() {
     }
 
     useEffect(() => {
-        client.models.Post.observeQuery().subscribe({
+        const postSub = client.models.Post.observeQuery().subscribe({
             next: () => fetchExtratedFeed(),
         })
 
         
-        client.models.UserProfile.observeQuery({
+        const userSub = client.models.UserProfile.observeQuery({
             filter: { 
                 id: { eq: user.userId } 
             }
@@ -125,11 +126,21 @@ function App() {
                 setUserProfile(items[0]);
             }
         })
+
+        return () => {
+            postSub.unsubscribe()
+            userSub.unsubscribe()
+        }
     }, [])
 
     return (
         <main>
             <h1>Welcome {user?.signInDetails?.loginId}</h1>
+            <div>
+                {userProfile?.imagePath && (
+                <AvatarImage imagePath={userProfile.imagePath} />
+                )}
+            </div>
             <h2>Image: {userProfile?.imagePath}</h2>
             <button onClick={ signOut }>SIGN OUT</button>
 
