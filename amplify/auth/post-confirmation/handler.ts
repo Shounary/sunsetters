@@ -18,7 +18,9 @@ export const handler: PostConfirmationTriggerHandler = async (event) => {
     id: sub, // Use Cognito 'sub' as the DB primary key
     name: "User1", 
     imagePath: "default-profile-pictures/default-pfp1.png",
-    owner: sub
+    owner: sub,
+    followers: [],
+    follows: []
   }).then((response) => {
     console.log('AppSync Response:', JSON.stringify(response, null, 2));
 

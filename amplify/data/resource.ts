@@ -24,9 +24,18 @@ const schema = a.schema({
     id: a.id().required(),
     name: a.string().required(),
     imagePath: a.string().required(),
-    owner: a.string()
+    owner: a.string(),
+    followers: a.string().required().array().required(),
+    follows: a.string().required().array().required()
   })
   .authorization((allow) => [allow.authenticated()]),
+
+  UserFeed: a.
+  model({
+    postID: a.string().required(),
+    ownerID: a.string().required(),
+  })
+  .authorization((allow) => allow.owner())
 })
 .authorization(allow => [
   allow.authenticated(),
