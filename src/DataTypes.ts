@@ -6,3 +6,8 @@ export type PostDisplay = {
     content: string,
     mediaURLs: URL[]
 }
+
+export interface INewPost {
+    textInput: string
+    imageInput: File | null
+}
