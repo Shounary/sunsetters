@@ -1,5 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { postConfirmation } from '../auth/post-confirmation/resource';
+import { userEvents } from '../functions/user-events/resource'
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -35,7 +36,19 @@ const schema = a.schema({
     postID: a.string().required(),
     ownerID: a.string().required(),
   })
-  .authorization((allow) => allow.owner())
+  .authorization((allow) => allow.owner()),
+
+
+  addToFeed: a.mutation()
+  .arguments({ postID: a.string().required(), ownerID: a.string().required()})
+  .handler(a.handler.function(userEvents))
+  .returns(a.boolean()),
+
+  addFollower: a.mutation()
+  .arguments({ followerID: a.string().required() })
+  .handler(a.handler.function(userEvents))
+  .returns(a.boolean()),
+
 })
 .authorization(allow => [
   allow.authenticated(),
