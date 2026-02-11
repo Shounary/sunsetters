@@ -5,7 +5,9 @@ import { storage } from './storage/resource';
 import { postConfirmation } from './auth/post-confirmation/resource';
 
 import { userEvents } from './functions/user-events/resource';
+import { fanoutWorker } from './functions/fanout-worker/resource';
 import * as sns from 'aws-cdk-lib/aws-sns';
+import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
 
 
 const backend = defineBackend({
@@ -13,6 +15,7 @@ const backend = defineBackend({
   data,
   storage,
   userEvents,
+  fanoutWorker,
   postConfirmation
 });
 
@@ -28,3 +31,7 @@ backend.userEvents.addEnvironment(
 )
 
 userUpdatesTopic.grantPublish(backend.userEvents.resources.lambda)
+
+userUpdatesTopic.addSubscription(
+  new subs.LambdaSubscription(backend.fanoutWorker.resources.lambda)
+)

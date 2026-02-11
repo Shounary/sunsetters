@@ -1,8 +1,14 @@
 import type { AppSyncResolverHandler } from 'aws-lambda';
 import { SNSClient, PublishCommand } from "@aws-sdk/client-sns";
 import { generateClient } from "aws-amplify/data";
+import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtime';
 import { env } from '$amplify/env/user-events';
+import { Amplify } from 'aws-amplify';
 import type { Schema } from "../../data/resource";
+
+
+const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
+Amplify.configure(resourceConfig, libraryOptions);
 
 const sns = new SNSClient({});
 const client = generateClient<Schema>();

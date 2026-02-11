@@ -1,6 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 import { postConfirmation } from '../auth/post-confirmation/resource';
 import { userEvents } from '../functions/user-events/resource'
+import { fanoutWorker } from "../functions/fanout-worker/resource";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -52,7 +53,9 @@ const schema = a.schema({
 })
 .authorization(allow => [
   allow.authenticated(),
-  allow.resource(postConfirmation) // <--- This triggers the env generation
+  allow.resource(postConfirmation),
+  allow.resource(userEvents),
+  allow.resource(fanoutWorker),
 ]);
 
 export type Schema = ClientSchema<typeof schema>;
