@@ -4,6 +4,7 @@ import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtim
 import { env } from '$amplify/env/fanout-worker';
 import { Amplify } from 'aws-amplify';
 import type { Schema } from '../../data/resource';
+import { UserEventPayload } from '../common/types';
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
 Amplify.configure(resourceConfig, libraryOptions);
@@ -15,63 +16,71 @@ export const handler: SNSHandler = async (event) => {
   for (const record of event.Records) {
     try {
       // 1. Parse the message your Dispatcher sent
-      const payload = JSON.parse(record.Sns.Message);
+      const payload = JSON.parse(record.Sns.Message) as UserEventPayload
       console.log(`Worker received event: ${payload.event}`);
 
       // 2. Route based on the event type
       switch (payload.event) {
-        case "FOLLOW":
+        case "FOLLOW_USER":
           await followUser(payload);
           break;
-        case "POST":
-          await updateFollowerFeeds(payload);
+          
+        case "ADD_POST_TO_FEED":
+          await addPostToFeed(payload);
           break;
+
+        default:
+          const _exhaustiveCheck: never = payload;
+          console.warn("Unknown event type", _exhaustiveCheck);
       }
     } catch (err) {
-      console.error("Worker failed processing record:", err);
+      console.error("Worker failed processing record: ", err);
       // Send this to a Dead Letter Queue (DLQ)
     }
   }
 };
 
 
-async function followUser(payload: any) {
-    const { userId } = payload;
-    // parse payload
+async function followUser(payload: UserEventPayload) {
 
-    const { data: targetUser } = await client.models.UserProfile.get({ id: payload.targetUserId })
+  const { data: targetUser } = await client.models.UserProfile.get({ id: payload.targetUserID })
 
-    if (targetUser == null) {
-        throw Error("Failed to get target user to follow")
-    }
+  if (targetUser == null) {
+      throw Error(`Failed to get target user ${payload.targetUserID} to follow`)
+  }
 
-    const followers = targetUser.followers
-    followers.push("payload originUserID")
+  const updatedFollowers = targetUser.followers
+  updatedFollowers.push(payload.originUserID)
 
-    client.models.UserProfile.update({
-        id: targetUser.id,
-        owner: targetUser.owner,
-        imagePath: targetUser.imagePath,
-        name: targetUser.name,
-        followers: followers,
-        follows: targetUser.follows
-    })
+  console.log(`Adding a new follower to ${payload.targetUserID}`);
+
+  client.models.UserProfile.update({
+      id: targetUser.id,
+      owner: targetUser.owner,
+      imagePath: targetUser.imagePath,
+      name: targetUser.name,
+      followers: updatedFollowers,
+      follows: targetUser.follows
+  })
 }
 
 
 
-async function updateFollowerFeeds(payload: any) {
-    const { userId } = payload;
-    // parse payload
-    
-    const { data: targetUserProfile } = await client.models.UserProfile.get({ id: payload.targetUserId })
+async function addPostToFeed(payload: UserEventPayload) {
 
-    console.log(`Fanout: Updating ${(targetUserProfile?.followers ?? []).length} followers...`);
+  if (payload.event != "ADD_POST_TO_FEED") {
+    console.error("Mismatch between an event name vs event handler")
+    return
+  }
     
-    await Promise.all(
-            (targetUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
-                postID: "payload postID variable",
-                ownerID: "payload ownerID variable"
-            }))
-        )
+  const { data: targetUserProfile } = await client.models.UserProfile.get({ id: payload.targetUserID })
+
+  console.log(`Fanout: Updating ${(targetUserProfile?.followers ?? []).length} follower feeds...`);
+  
+  await Promise.all(
+      (targetUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
+          postID: payload.newPostID,
+          ownerID: payload.originUserID
+      }))
+    )
 }

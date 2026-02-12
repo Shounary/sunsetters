@@ -8,6 +8,7 @@ import { AvatarImage } from "./DisplayTypes";
 
 function App() {
     const client = generateClient<Schema>();
+
     async function fetchPostFeed() {
         const { data: feedPosts } = await client.models.Post.list()
         return feedPosts
