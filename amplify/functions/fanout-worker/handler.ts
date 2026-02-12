@@ -4,7 +4,7 @@ import { getAmplifyDataClientConfig } from '@aws-amplify/backend/function/runtim
 import { env } from '$amplify/env/fanout-worker';
 import { Amplify } from 'aws-amplify';
 import type { Schema } from '../../data/resource';
-import { UserEventPayload } from '../common/types';
+import { UserEvent, UserEventPayload } from '../common/types';
 
 const { resourceConfig, libraryOptions } = await getAmplifyDataClientConfig(env);
 Amplify.configure(resourceConfig, libraryOptions);
@@ -17,21 +17,18 @@ export const handler: SNSHandler = async (event) => {
     try {
       // 1. Parse the message your Dispatcher sent
       const payload = JSON.parse(record.Sns.Message) as UserEventPayload
-      console.log(`Worker received event: ${payload.event}`);
+      console.log(`Worker received event: ${payload.userEvent}`);
 
       // 2. Route based on the event type
-      switch (payload.event) {
-        case "FOLLOW_USER":
+      switch (payload.userEvent) {
+        case UserEvent.FOLLOW_USER:
           await followUser(payload);
           break;
           
-        case "ADD_POST_TO_FEED":
+        case UserEvent.ADD_POST_TO_FEED:
           await addPostToFeed(payload);
           break;
 
-        default:
-          const _exhaustiveCheck: never = payload;
-          console.warn("Unknown event type", _exhaustiveCheck);
       }
     } catch (err) {
       console.error("Worker failed processing record: ", err);
@@ -43,7 +40,7 @@ export const handler: SNSHandler = async (event) => {
 
 async function followUser(payload: UserEventPayload) {
 
-  if (payload.event != "FOLLOW_USER") {
+  if (payload.userEvent != UserEvent.FOLLOW_USER) {
     console.error("Mismatch between an event name vs event handler")
     return
   }
@@ -73,7 +70,7 @@ async function followUser(payload: UserEventPayload) {
 
 async function addPostToFeed(payload: UserEventPayload) {
 
-  if (payload.event != "ADD_POST_TO_FEED") {
+  if (payload.userEvent != UserEvent.ADD_POST_TO_FEED) {
     console.error("Mismatch between an event name vs event handler")
     return
   }

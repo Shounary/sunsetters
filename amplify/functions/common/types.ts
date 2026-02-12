@@ -1,16 +1,23 @@
+export enum UserEvent {
+    FOLLOW_USER = "FOLLOW_USER",
+    ADD_POST_TO_FEED = "ADD_POST_TO_FEED"
+}
 
 
 export type UserEventPayload = 
-  | { event: "FOLLOW_USER"; originUserID: string; targetUserID: string }
-  | { event: "ADD_POST_TO_FEED"; originUserID: string; newPostID: string };
+    | { userEvent: UserEvent.FOLLOW_USER; originUserID: string; targetUserID: string }
+    | { userEvent: UserEvent.ADD_POST_TO_FEED; originUserID: string; newPostID: string };
+
 
 export type  SchemaMutationArgs = {
 
-  // Base
-  originUserID?: string
-  targetUserID?: string
+    userEvent: string
 
-  // Post
-  newPostID?: string,
+    // Base
+    originUserID?: string
+    targetUserID?: string
+
+    // Post
+    newPostID?: string,
 
 }

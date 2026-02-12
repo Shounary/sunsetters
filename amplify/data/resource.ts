@@ -39,14 +39,8 @@ const schema = a.schema({
   })
   .authorization((allow) => allow.owner()),
 
-
-  addPostToFollowerFeeds: a.mutation()
-  .arguments({ originUserID: a.string().required(), newPostID: a.string().required() })
-  .handler(a.handler.function(userEvents))
-  .returns(a.boolean()),
-
-  followUser: a.mutation()
-  .arguments({ originUserID: a.string().required(), targetUserID: a.string().required() })
+  userEvent: a.mutation()
+  .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
   .handler(a.handler.function(userEvents))
   .returns(a.boolean()),
 

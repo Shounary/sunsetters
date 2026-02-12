@@ -5,6 +5,7 @@ import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
+import { UserEvent } from "../amplify/functions/common/types";
 
 function App() {
     const client = generateClient<Schema>();
@@ -78,7 +79,7 @@ function App() {
                 })
 
                 console.log("Calling client.mutations on frontend")
-                client.mutations.addPostToFollowerFeeds({ originUserID: user.userId, newPostID: postData.id })
+                client.mutations.userEvent({ userEvent: UserEvent.ADD_POST_TO_FEED, originUserID: user.userId, newPostID: postData.id })
             })
         })
     }
