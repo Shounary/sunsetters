@@ -21,17 +21,17 @@ const backend = defineBackend({
 
 const fanoutStack = backend.createStack('UserFanoutStack')
 
-const userUpdatesTopic = new sns.Topic(fanoutStack, 'UserUpdatesTopic', {
-  topicName: 'user-updates-topic'
+const userEventsTopic = new sns.Topic(fanoutStack, 'UserEventsTopic', {
+  topicName: 'user-events-topic'
 })
 
 backend.userEvents.addEnvironment(
   'SNS_TOPIC_ARN',
-  userUpdatesTopic.topicArn
+  userEventsTopic.topicArn
 )
 
-userUpdatesTopic.grantPublish(backend.userEvents.resources.lambda)
+userEventsTopic.grantPublish(backend.userEvents.resources.lambda)
 
-userUpdatesTopic.addSubscription(
+userEventsTopic.addSubscription(
   new subs.LambdaSubscription(backend.fanoutWorker.resources.lambda)
 )
