@@ -22,11 +22,11 @@ export const handler: AppSyncResolverHandler<SchemaMutationArgs, boolean> = asyn
 
   try {
     switch (fieldName) {
-      case "addFollower":
+      case "followUser":
         if (!originUserID || !targetUserID) throw new Error("Missing originUserID, targetUserID");
         return await followHandler(originUserID, targetUserID);
 
-      case "addToFeed":
+      case "addPostToFollowerFeeds":
         if (!newPostID || !originUserID || !targetUserID) throw new Error("Missing newPostID, originUserID, targetUserID");
         return await updateFeedHandler(originUserID, targetUserID, newPostID);
 
@@ -47,7 +47,7 @@ async function followHandler(originUserID: string, targetUserID: string) {
 }
 
 async function updateFeedHandler(originUserID: string, targetUserID: string, newPostID: string) {
-  await publishToSNS({ event: "ADD_POST_TO_FEED", originUserID: originUserID, targetUserID: targetUserID, newPostID: newPostID });
+  await publishToSNS({ event: "ADD_POST_TO_FEED", originUserID: originUserID, newPostID: newPostID });
   return true;
 }
 

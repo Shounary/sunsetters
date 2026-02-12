@@ -43,6 +43,11 @@ export const handler: SNSHandler = async (event) => {
 
 async function followUser(payload: UserEventPayload) {
 
+  if (payload.event != "FOLLOW_USER") {
+    console.error("Mismatch between an event name vs event handler")
+    return
+  }
+
   const { data: targetUser } = await client.models.UserProfile.get({ id: payload.targetUserID })
 
   if (targetUser == null) {
@@ -73,12 +78,12 @@ async function addPostToFeed(payload: UserEventPayload) {
     return
   }
     
-  const { data: targetUserProfile } = await client.models.UserProfile.get({ id: payload.targetUserID })
+  const { data: originUserProfile } = await client.models.UserProfile.get({ id: payload.originUserID })
 
-  console.log(`Fanout: Updating ${(targetUserProfile?.followers ?? []).length} follower feeds...`);
+  console.log(`Fanout: Updating ${(originUserProfile?.followers ?? []).length} follower feeds...`);
   
   await Promise.all(
-      (targetUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
+      (originUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
           postID: payload.newPostID,
           ownerID: payload.originUserID
       }))

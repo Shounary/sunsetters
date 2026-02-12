@@ -40,8 +40,8 @@ const schema = a.schema({
   .authorization((allow) => allow.owner()),
 
 
-  addPostToUserFeed: a.mutation()
-  .arguments({ originUserID: a.string().required(), targetUserID: a.string().required(), newPostID: a.string().required() })
+  addPostToFollowerFeeds: a.mutation()
+  .arguments({ originUserID: a.string().required(), newPostID: a.string().required() })
   .handler(a.handler.function(userEvents))
   .returns(a.boolean()),
 
