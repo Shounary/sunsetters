@@ -77,7 +77,13 @@ async function addPostToFeed(payload: UserEventPayload) {
     
   const { data: originUserProfile } = await client.models.UserProfile.get({ id: payload.originUserID })
 
-  console.log(`Fanout: Updating ${(originUserProfile?.followers ?? []).length} follower feeds...`);
+  if (!originUserProfile) {
+    throw Error(`Failed to get origin user profile ${payload.originUserID}`)
+  }
+
+  console.log(`User ${originUserProfile.id} has these followers: ${originUserProfile.followers}`)
+
+  console.log(`Fanout: Updating ${originUserProfile.followers.length} follower feeds...`);
   
   await Promise.all(
       (originUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
