@@ -77,6 +77,7 @@ function App() {
                     console.log(`Post for ${newPost.imageInput?.name} update with newly uploaded image ${uploaded.path}`)
                 })
 
+                console.log("Calling client.mutations on frontend")
                 client.mutations.addPostToFollowerFeeds({ originUserID: user.userId, newPostID: postData.id })
             })
         })
