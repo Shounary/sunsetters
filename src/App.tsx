@@ -5,9 +5,11 @@ import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
+import { UserEvent } from "../amplify/functions/common/types";
 
 function App() {
     const client = generateClient<Schema>();
+
     async function fetchPostFeed() {
         const { data: feedPosts } = await client.models.Post.list()
         return feedPosts
@@ -75,6 +77,9 @@ function App() {
                 }).then(() => {
                     console.log(`Post for ${newPost.imageInput?.name} update with newly uploaded image ${uploaded.path}`)
                 })
+
+                console.log("Calling client.mutations on frontend")
+                client.mutations.userEvent({ userEvent: UserEvent.ADD_POST_TO_FEED, originUserID: user.userId, newPostID: postData.id })
             })
         })
     }
