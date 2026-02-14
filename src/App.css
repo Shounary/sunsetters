@@ -40,3 +40,243 @@
 .read-the-docs {
   color: #888;
 }
+
+/* --- Global & Layout --- */
+:root {
+  --primary-pink: #ec4899;
+  --bg-gradient-start: #eef2ff; /* indigo-50 */
+  --bg-gradient-mid: #f3e8ff;   /* purple-50 */
+  --bg-gradient-end: #fdf2f8;   /* pink-50 */
+  --shadow-nav: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.app-container {
+  min-height: 100vh;
+  width: 100%;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+  padding-bottom: 5rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.header-section {
+  padding-top: 8rem; /* 32 in tailwind approx */
+  padding-bottom: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #1f2937;
+  letter-spacing: -0.025em;
+}
+
+.highlight {
+  color: var(--primary-pink);
+}
+
+/* --- Segmented Navigation Component --- */
+.nav-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: #f3f4f6; /* gray-100 */
+  border-radius: 9999px; /* full rounded */
+  padding: 0.5rem;
+  box-shadow: var(--shadow-nav);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  overflow: hidden; /* Ensures the gloss doesn't spill out */
+}
+
+/* The subtle split-tone gloss effect */
+.nav-gloss {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, rgba(229, 231, 235, 0.5), transparent);
+  pointer-events: none;
+}
+
+.nav-button {
+  position: relative;
+  z-index: 10;
+  padding: 0.75rem 2rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 600;
+  color: #6b7280; /* gray-500 */
+  transition: color 0.3s ease;
+}
+
+.nav-button:hover {
+  color: #4b5563; /* gray-600 */
+}
+
+.nav-button.active {
+  color: #1f2937; /* gray-800 */
+}
+
+/* The pink indicator line */
+.active-indicator {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 4px;
+  background-color: var(--primary-pink);
+  border-radius: 9999px;
+  animation: fadeInBar 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scaleX(0.5); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes fadeInBar {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0.5); 
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+/* --- View Components --- */
+.view-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* Feed Items */
+.feed-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  border: 1px solid #f3f4f6;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.user-info {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #f472b6, #60a5fa);
+}
+
+.card-image-placeholder {
+  height: 16rem;
+  background-color: #f3f4f6;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #d1d5db;
+}
+
+/* Grid View */
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.grid-item {
+  aspect-ratio: 1 / 1;
+  background-color: #e5e7eb;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.grid-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.grid-item:hover .grid-image {
+  transform: scale(1.05);
+}
+
+/* List View */
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 0.75rem;
+}
+
+/* --- Scrollable Area Styles --- */
+
+/* 1. The Container */
+.feed-scroll-view {
+  /* Fix the height. 
+     'calc(100vh - 300px)' creates a responsive height that fills 
+     the screen minus the space used by the header/nav. */
+  height: calc(100vh - 300px); 
+  min-height: 400px; /* Ensure it doesn't get too small on mobile */
+  
+  /* Enable vertical scrolling */
+  overflow-y: auto;
+  
+  /* Smooth scrolling feel */
+  scroll-behavior: smooth;
+  
+  /* Padding to prevent content hitting edges */
+  padding: 1rem 0.5rem; 
+}
+
+/* 2. Hide Default Scrollbar (Cleaner UI) */
+/* Firefox */
+.feed-scroll-view {
+  scrollbar-width: none;
+}
+/* Chrome, Safari, Edge */
+.feed-scroll-view::-webkit-scrollbar {
+  display: none;
+}
+
+/* 3. Optional: Add a fade mask at the bottom so content doesn't cut off abruptly */
+.feed-mask {
+  position: relative;
+}
+.feed-mask::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--bg-gradient-end), transparent);
+  pointer-events: none;
+  z-index: 20;
+}

@@ -86,9 +86,9 @@ async function addPostToFeed(payload: UserEventPayload) {
   console.log(`Fanout: Updating ${originUserProfile.followers.length} follower feeds...`);
   
   await Promise.all(
-      (originUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
+      (originUserProfile?.followers ?? []).map( follower => client.models.FeedPost.create({
           postID: payload.newPostID,
-          ownerID: payload.originUserID
+          owner: payload.originUserID
       }))
     )
 }

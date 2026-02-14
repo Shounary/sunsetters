@@ -22,7 +22,7 @@ const backend = defineBackend({
 const fanoutStack = backend.createStack('UserFanoutStack')
 
 const userEventsTopic = new sns.Topic(fanoutStack, 'UserEventsTopic', {
-  topicName: 'user-events-topic'
+  topicName: 'user-events-topic-sandbox'
 })
 
 backend.userEvents.addEnvironment(
