@@ -88,7 +88,8 @@ async function addPostToFeed(payload: UserEventPayload) {
   await Promise.all(
       (originUserProfile?.followers ?? []).map( follower => client.models.FeedPost.create({
           postID: payload.newPostID,
-          owner: payload.originUserID
+          owner: payload.originUserID,
+          wasViewed: false
       }))
     )
 }

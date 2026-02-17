@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getUrl, uploadData } from "aws-amplify/storage";
+import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
@@ -13,41 +13,50 @@ function App() {
 
     async function fetchUserPosts() {
         const { data: userPosts } = await client.models.UserPost.list()
-        const fetch = userPosts.map(postID => 
-            client.models.Post.get({ id: postID.id })
+        const fetch = userPosts.map(post => 
+            client.models.Post.get({ id: post.postID })
         )
         
         const rawPosts = await Promise.all(fetch)
-        console.log(rawPosts)
 
         const posts = rawPosts
             .map(r => r.data)
-            // .filter(item => item !== null)
+            .filter(item => item !== null)
+        
+        const sortedPosts = posts.sort( (a, b) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
 
-        return posts
+        return sortedPosts
     }
 
-    // async function fetchUserFeed() {
-    //     const { data: userFeed } = await client.models.FeedPost.list()
-    //     const fetch = userFeed.map(postID => 
-    //         client.models.Post.get({ id: postID.id })
-    //     )
+    // TODO: add wasViewedCheck
 
-    //     const rawFeed = await Promise.all(fetch)
+    async function fetchUserFeed() {
+        const { data: userFeed } = await client.models.FeedPost.list()
+        const fetch = userFeed.map(post => 
+            client.models.Post.get({ id: post.postID })
+        )
 
-    //     const feed = rawFeed
-    //         .map(r => r.data)
-    //         // .filter(item => item !== null)
+        const rawFeed = await Promise.all(fetch)
 
-    //     return feed
-    // }
+        const feed = rawFeed
+            .map(r => r.data)
+            .filter(item => item !== null)
+
+        const sortedFeed = feed.sort( (a, b) => 
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+
+        return sortedFeed
+    }
     
 
     const [newPost, setNewPost] = useState<INewPost>({
         textInput: '',
         imageInput: null
     })
-    const [feedDisplay] = useState<Array<PostDisplay>>([])
+    const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const [postsDisplay, setPostsDisplay] = useState<Array<PostDisplay>>([])
 
     const [userProfile, setUserProfile] = useState<Schema["UserProfile"]["type"]>()
@@ -132,35 +141,35 @@ function App() {
 
 
     // DELETE POST
-    // const deletePost = (id: string) => {
-    //     client.models.UserPost.delete({ id: id })
-    //     client.models.Post.get({ id: id }).then((post) => {
-    //         if (!post || !post.data?.imagePath) {
-    //            console.warn(`Could not find post with id ${id} to delete!`)
-    //            return
-    //         }
-    //         client.models.Post.delete({ id: id })
-    //         setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
-    //         remove({ path: post.data?.imagePath })
-    //     })
-    // }
+    const deletePost = (id: string) => {
+        client.models.UserPost.delete({ id: id })
+        client.models.Post.get({ id: id }).then((post) => {
+            if (!post || !post.data?.imagePath) {
+               console.warn(`Could not find post with id ${id} to delete!`)
+               return
+            }
+            client.models.Post.delete({ id: id })
+            setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
+            remove({ path: post.data?.imagePath })
+        })
+    }
 
 
-    // // FEED DISPLAY
-    // const fetchExtratedFeed = async () => {
-    //     const postFeed = await fetchUserFeed()
-    //     postFeed.forEach(async post => {
-    //         setFeedDisplay(() => [])
-    //         if (!post?.imagePath) return
-    //         const imageURL = await getUrl({ path: post.imagePath })
-    //         const postDisplay: PostDisplay = {
-    //             id: post.id,
-    //             content: post.content ?? "",
-    //             mediaURLs: [imageURL.url]
-    //         }
-    //         setFeedDisplay((prev) => [...prev, postDisplay])
-    //     });
-    // }
+    // FEED DISPLAY
+    const fetchExtratedFeed = async () => {
+        const postFeed = await fetchUserFeed()
+        postFeed.forEach(async post => {
+            setFeedDisplay(() => [])
+            if (!post?.imagePath) return
+            const imageURL = await getUrl({ path: post.imagePath })
+            const postDisplay: PostDisplay = {
+                id: post.id,
+                content: post.content ?? "",
+                mediaURLs: [imageURL.url]
+            }
+            setFeedDisplay((prev) => [...prev, postDisplay])
+        });
+    }
 
     // POSTS DISPLAY
     const fetchExtratedPosts = async () => {
@@ -317,7 +326,7 @@ function App() {
 
 const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
   // 1. Create a larger list of items to ensure scrolling triggers
-//   const items = Array.from({ length: 15 }, (_, i) => i + 1);
+  const items = Array.from({ length: 15 }, (_, i) => i + 1);
 
   return (
     // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
@@ -367,10 +376,8 @@ const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
   );
 };
 
-const MyPostsView = ( { postsDisplay } : {postsDisplay: PostDisplay[]}) => {
+const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
   // 1. Create a larger list of items to ensure scrolling triggers
-//   const items = Array.from({ length: 15 }, (_, i) => i + 1);
-  console.log(postsDisplay.length)
 
   return (
     // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
@@ -404,6 +411,8 @@ const MyPostsView = ( { postsDisplay } : {postsDisplay: PostDisplay[]}) => {
                 alt={post.mediaURLs[0].toString()} 
                 style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
             />
+
+            {post.content}
             
             <div style={{ display: 'flex', gap: '1.5rem', color: '#4b5563', fontSize: '0.9rem' }}>
                <span style={{ cursor: 'pointer' }}>❤️ {100}</span>

@@ -20,6 +20,7 @@ const schema = a.schema({
     imagePath: a.string(),
   })
   .authorization((allow) => [allow.authenticated()]),
+  
 
   UserProfile: a
   .model({
@@ -36,6 +37,7 @@ const schema = a.schema({
   model({
     postID: a.string().required(),
     owner: a.string().required(),
+    wasViewed: a.boolean().required()
   })
   .authorization((allow) => [allow.owner()]),
 
