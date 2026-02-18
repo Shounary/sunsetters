@@ -28,8 +28,8 @@ const schema = a.schema({
     name: a.string().required(),
     imagePath: a.string().required(),
     owner: a.string(),
-    followers: a.string().required().array().required(),
-    follows: a.string().required().array().required()
+    followers: a.string().required().array().default([]),
+    follows: a.string().required().array().default([])
   })
   .authorization((allow) => [allow.authenticated()]),
 
@@ -37,7 +37,7 @@ const schema = a.schema({
   model({
     postID: a.string().required(),
     owner: a.string().required(),
-    wasViewed: a.boolean().required()
+    wasViewed: a.boolean().default(false)
   })
   .authorization((allow) => [allow.owner()]),
 
@@ -53,6 +53,11 @@ const schema = a.schema({
   .returns(a.boolean()),
 
 })
+
+
+
+
+
 .authorization(allow => [
   allow.authenticated(),
   allow.resource(postConfirmation),

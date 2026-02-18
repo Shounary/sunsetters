@@ -58,7 +58,7 @@ function App() {
         })
         
         const unfollowedUsers = users
-            .filter(user => !userProfile?.followers.includes(user.id))
+            .filter(user => !userProfile?.followers?.includes(user.id))
         
         return unfollowedUsers
     }
@@ -82,7 +82,7 @@ function App() {
         switch (currentTab) {
             case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
             case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
-            case "Follows": return <FollowsView users={usersToFollow}/>;
+            case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
             default: return null;
         }
     };
@@ -166,6 +166,15 @@ function App() {
     //         remove({ path: post.data?.imagePath })
     //     })
     // }
+
+    // FOLLOW USER
+    const followUser = async (targetUser: UserDisplay) => {
+        client.mutations.userEvent( {
+            userEvent: UserEvent.FOLLOW_USER,
+            originUserID: user.userId,
+            targetUserID: targetUser.id
+        })
+    }
 
 
     // FEED DISPLAY
@@ -464,7 +473,7 @@ const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
   );
 };
 
-const FollowsView = ( { users } : { users: UserDisplay[] }) => (
+const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser: (targetUser: UserDisplay) => Promise<void> }) => (
     <div className="view-wrapper">
         {users.map(user => (
         <div key={user.id} className="list-item">
@@ -483,7 +492,8 @@ const FollowsView = ( { users } : { users: UserDisplay[] }) => (
             background: 'white', 
             color: '#4f46e5',
             cursor: 'pointer'
-            }}>
+            }} 
+            onClick={() => followUser(user)}>
             Follow
             </button>
         </div>
