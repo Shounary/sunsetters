@@ -28,8 +28,8 @@ const schema = a.schema({
     name: a.string().required(),
     imagePath: a.string().required(),
     owner: a.string(),
-    followers: a.string().required().array().default([]),
-    follows: a.string().required().array().default([])
+    followers: a.string().required().array(),
+    follows: a.string().required().array()
   })
   .authorization((allow) => [allow.authenticated()]),
 

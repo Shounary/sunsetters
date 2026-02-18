@@ -493,7 +493,9 @@ const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser
             color: '#4f46e5',
             cursor: 'pointer'
             }} 
-            onClick={() => followUser(user)}>
+            onClick={
+                () => followUser(user)
+            }>
             Follow
             </button>
         </div>
