@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getUrl, uploadData, remove } from "aws-amplify/storage";
+import { getUrl, uploadData } from "aws-amplify/storage";
+// import { remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
-import { PostDisplay, INewPost } from "./DataTypes";
+import { PostDisplay, INewPost, UserDisplay } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
 import { UserEvent } from "../amplify/functions/common/types";
 import NavigationBar from "./NavigationBar";
@@ -50,6 +51,17 @@ function App() {
 
         return sortedFeed
     }
+
+    async function fetchUsersToFollow() {
+        const { data: users } =  await client.models.UserProfile.list({
+            limit: 10
+        })
+        
+        const unfollowedUsers = users
+            .filter(user => !userProfile?.followers.includes(user.id))
+        
+        return unfollowedUsers
+    }
     
 
     const [newPost, setNewPost] = useState<INewPost>({
@@ -58,6 +70,7 @@ function App() {
     })
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const [postsDisplay, setPostsDisplay] = useState<Array<PostDisplay>>([])
+    const [usersToFollow, setUsersToFollow] = useState<Array<UserDisplay>>([])
 
     const [userProfile, setUserProfile] = useState<Schema["UserProfile"]["type"]>()
     const { user, signOut } = useAuthenticator()
@@ -69,7 +82,7 @@ function App() {
         switch (currentTab) {
             case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
             case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
-            case "Follows": return <FollowsView />;
+            case "Follows": return <FollowsView users={usersToFollow}/>;
             default: return null;
         }
     };
@@ -141,25 +154,25 @@ function App() {
 
 
     // DELETE POST
-    const deletePost = (id: string) => {
-        client.models.UserPost.delete({ id: id })
-        client.models.Post.get({ id: id }).then((post) => {
-            if (!post || !post.data?.imagePath) {
-               console.warn(`Could not find post with id ${id} to delete!`)
-               return
-            }
-            client.models.Post.delete({ id: id })
-            setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
-            remove({ path: post.data?.imagePath })
-        })
-    }
+    // const deletePost = (id: string) => {
+    //     client.models.UserPost.delete({ id: id })
+    //     client.models.Post.get({ id: id }).then((post) => {
+    //         if (!post || !post.data?.imagePath) {
+    //            console.warn(`Could not find post with id ${id} to delete!`)
+    //            return
+    //         }
+    //         client.models.Post.delete({ id: id })
+    //         setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
+    //         remove({ path: post.data?.imagePath })
+    //     })
+    // }
 
 
     // FEED DISPLAY
-    const fetchExtratedFeed = async () => {
+    const extractFeed = async () => {
         const postFeed = await fetchUserFeed()
         postFeed.forEach(async post => {
-            setFeedDisplay(() => [])
+            setFeedDisplay([])
             if (!post?.imagePath) return
             const imageURL = await getUrl({ path: post.imagePath })
             const postDisplay: PostDisplay = {
@@ -172,12 +185,12 @@ function App() {
     }
 
     // POSTS DISPLAY
-    const fetchExtratedPosts = async () => {
+    const extractPosts = async () => {
         const postFeed = await fetchUserPosts()
         console.log(`fetching posts of length: ${postFeed.length}`)
         postFeed.forEach(async post => {
             console.log(post)
-            setPostsDisplay(() => [])
+            setPostsDisplay([])
             if (!post?.imagePath) return
             const imageURL = await getUrl({ path: post.imagePath })
             const postDisplay: PostDisplay = {
@@ -186,14 +199,36 @@ function App() {
                 mediaURLs: [imageURL.url]
             }
             setPostsDisplay((prev) => [...prev, postDisplay])
-            console.warn(`get ${postsDisplay.length} new posts`)
+        });
+    }
+
+    const extractUsersToFollow = async () => {
+        const usersToFollow = await fetchUsersToFollow()
+        usersToFollow.forEach(async u => {
+            setUsersToFollow([])
+            if (!u) return
+            const pfpURL = await getUrl({ path: u.imagePath })
+            const userDisplay: UserDisplay = {
+                id: u.id,
+                name: u.name,
+                profilePicture: pfpURL.url
+            }
+            setUsersToFollow((prev) => [...prev, userDisplay])
         });
     }
 
     useEffect(() => {
         const postSub = client.models.UserPost.observeQuery().subscribe({
-            next: () => fetchExtratedPosts(),
+            next: () => extractPosts(),
         })
+
+        // const feedSub = client.models.FeedPost.observeQuery({
+        //     filter: {
+        //         id: { eq: user.userId }
+        //     }
+        // }).subscribe({
+        //     next: () => extractFeed(),
+        // })
 
         
         const userSub = client.models.UserProfile.observeQuery({
@@ -204,11 +239,14 @@ function App() {
             next: ({ items }) => {
                 console.log(`Fetching user by id: ${user.userId}`)
                 setUserProfile(items[0]);
+                extractFeed()
+                extractUsersToFollow()
             }
         })
 
         return () => {
             postSub.unsubscribe()
+            // feedSub.unsubscribe()
             userSub.unsubscribe()
         }
     }, [])
@@ -325,9 +363,6 @@ function App() {
 }
 
 const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
-  // 1. Create a larger list of items to ensure scrolling triggers
-  const items = Array.from({ length: 15 }, (_, i) => i + 1);
-
   return (
     // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
     <div className="feed-mask view-wrapper">
@@ -429,15 +464,16 @@ const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
   );
 };
 
-const FollowsView = () => (
+const FollowsView = ( { users } : { users: UserDisplay[] }) => (
     <div className="view-wrapper">
-        {['Alice Design', 'Bob Dev', 'Charlie PM'].map((name, i) => (
-        <div key={i} className="list-item">
+        {users.map(user => (
+        <div key={user.id} className="list-item">
             <div className="user-info">
-            <div className="avatar" style={{ background: i % 2 === 0 ? '#818cf8' : '#f472b6' }} />
+            {/* <div className="avatar" style={{ background: i % 2 === 0 ? '#818cf8' : '#f472b6' }} /> */}
+            <div> <img src={user.profilePicture.toString()} alt="pfp" /></div>
             <div>
-                <h4 style={{ margin: 0 }}>{name}</h4>
-                <small style={{ color: '#6b7280' }}>@user_{name.split(' ')[0].toLowerCase()}</small>
+                <h4 style={{ margin: 0 }}>{user.name}</h4>
+                <small style={{ color: '#6b7280' }}>@user_{user.name.split(' ')[0].toLowerCase()}</small>
             </div>
             </div>
             <button style={{ 
@@ -448,7 +484,7 @@ const FollowsView = () => (
             color: '#4f46e5',
             cursor: 'pointer'
             }}>
-            Following
+            Follow
             </button>
         </div>
         ))}

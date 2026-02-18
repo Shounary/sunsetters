@@ -7,6 +7,12 @@ export type PostDisplay = {
     mediaURLs: URL[]
 }
 
+export type UserDisplay = {
+    id: string
+    name: string
+    profilePicture: URL
+}
+
 export interface INewPost {
     textInput: string
     imageInput: File | null
