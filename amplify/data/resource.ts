@@ -1,7 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-import { postConfirmation } from '../auth/post-confirmation/resource';
+// import { postConfirmation } from '../auth/post-confirmation/resource';
 import { userEvents } from '../functions/user-events/resource'
-import { fanoutWorker } from "../functions/fanout-worker/resource";
+// import { fanoutWorker } from "../functions/fanout-worker/resource";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -19,7 +19,7 @@ const schema = a.schema({
     content: a.string(),
     imagePath: a.string(),
   })
-  .authorization((allow) => [allow.authenticated()]),
+  .authorization((allow) => [allow.publicApiKey()]),
   
 
   UserProfile: a
@@ -31,7 +31,7 @@ const schema = a.schema({
     followers: a.string().required().array(),
     follows: a.string().required().array()
   })
-  .authorization((allow) => [allow.authenticated()]),
+  .authorization((allow) => [allow.publicApiKey()]),
 
   FeedPost: a.
   model({
@@ -39,13 +39,13 @@ const schema = a.schema({
     owner: a.string().required(),
     wasViewed: a.boolean().default(false)
   })
-  .authorization((allow) => [allow.owner()]),
+  .authorization((allow) => [allow.publicApiKey()]),
 
   UserPost: a.
   model({
     postID: a.string().required()
   })
-  .authorization((allow) => [allow.owner()]),
+  .authorization((allow) => [allow.publicApiKey()]),
 
   userEvent: a.mutation()
   .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
@@ -58,19 +58,19 @@ const schema = a.schema({
 
 
 
-.authorization(allow => [
-  allow.authenticated(),
-  allow.resource(postConfirmation),
-  allow.resource(userEvents),
-  allow.resource(fanoutWorker),
-]);
+// .authorization(allow => [
+//   allow.authenticated(),
+//   allow.resource(postConfirmation),
+//   allow.resource(userEvents),
+//   allow.resource(fanoutWorker),
+// ]);
 
 export type Schema = ClientSchema<typeof schema>;
 
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: "userPool",
+    defaultAuthorizationMode: "apiKey",
     // API Key is used for a.allow.public() rules
     apiKeyAuthorizationMode: {  
       expiresInDays: 30,

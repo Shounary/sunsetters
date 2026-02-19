@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { getUrl } from "aws-amplify/storage";
-import { UserDisplay } from "./DataTypes";
 
 
 export function AvatarImage({ imagePath }: { imagePath: string }) {
