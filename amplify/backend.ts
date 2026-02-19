@@ -9,7 +9,7 @@ import { storage } from './storage/resource';
 // import * as sns from 'aws-cdk-lib/aws-sns';
 // import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
 
-
+//
 const backend = defineBackend({
   // auth,
   data,
