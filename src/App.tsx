@@ -5,7 +5,7 @@ import { getUrl, uploadData } from "aws-amplify/storage";
 // import { remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost, UserDisplay } from "./DataTypes";
-import { AvatarImage } from "./DisplayTypes";
+import { AvatarImage, FollowButton } from "./DisplayTypes";
 import { UserEvent } from "../amplify/functions/common/types";
 import NavigationBar from "./NavigationBar";
 
@@ -168,11 +168,11 @@ function App() {
     // }
 
     // FOLLOW USER
-    const followUser = async (targetUser: UserDisplay) => {
+    const followUser = async (targetUserID: string) => {
         client.mutations.userEvent( {
             userEvent: UserEvent.FOLLOW_USER,
             originUserID: user.userId,
-            targetUserID: targetUser.id
+            targetUserID: targetUserID
         })
     }
 
@@ -473,7 +473,7 @@ const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
   );
 };
 
-const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser: (targetUser: UserDisplay) => Promise<void> }) => (
+const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser: (targetUserID: string) => Promise<void> }) => (
     <div className="view-wrapper">
         {users.map(user => (
         <div key={user.id} className="list-item">
@@ -485,19 +485,7 @@ const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser
                 <small style={{ color: '#6b7280' }}>@user_{user.name.split(' ')[0].toLowerCase()}</small>
             </div>
             </div>
-            <button style={{ 
-                padding: '4px 12px', 
-                borderRadius: '99px', 
-                border: '1px solid #818cf8', 
-                background: 'white', 
-                color: '#4f46e5',
-                cursor: 'pointer'
-            }} 
-            onClick={
-                () => followUser(user)
-            }>
-            Follow
-            </button>
+            <FollowButton onClick={followUser} userID = {user.id}></FollowButton>
         </div>
         ))}
     </div>
