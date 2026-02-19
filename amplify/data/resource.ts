@@ -1,6 +1,6 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
 // import { postConfirmation } from '../auth/post-confirmation/resource';
-import { userEvents } from '../functions/user-events/resource'
+// import { userEvents } from '../functions/user-events/resource'
 // import { fanoutWorker } from "../functions/fanout-worker/resource";
 
 /*== STEP 1 ===============================================================
@@ -49,7 +49,7 @@ const schema = a.schema({
 
   userEvent: a.mutation()
   .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
-  .handler(a.handler.function(userEvents))
+  // .handler(a.handler.function(userEvents))
   .returns(a.boolean()),
 
 })
