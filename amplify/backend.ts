@@ -1,5 +1,5 @@
 import { defineBackend } from '@aws-amplify/backend';
-// import { auth } from './auth/resource';
+import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 // import { postConfirmation } from './auth/post-confirmation/resource';
@@ -11,7 +11,7 @@ import { storage } from './storage/resource';
 
 //
 const backend = defineBackend({
-  // auth,
+  auth,
   data,
   storage,
   // userEvents,
