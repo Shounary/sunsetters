@@ -479,19 +479,19 @@ const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser
         <div key={user.id} className="list-item">
             <div className="user-info">
             {/* <div className="avatar" style={{ background: i % 2 === 0 ? '#818cf8' : '#f472b6' }} /> */}
-            <div> <img src={user.profilePicture.toString()} alt="pfp" /></div>
+            <div> <img className="avatar" src={user.profilePicture.toString()} alt="pfp" /></div>
             <div>
                 <h4 style={{ margin: 0 }}>{user.name}</h4>
                 <small style={{ color: '#6b7280' }}>@user_{user.name.split(' ')[0].toLowerCase()}</small>
             </div>
             </div>
             <button style={{ 
-            padding: '4px 12px', 
-            borderRadius: '99px', 
-            border: '1px solid #818cf8', 
-            background: 'white', 
-            color: '#4f46e5',
-            cursor: 'pointer'
+                padding: '4px 12px', 
+                borderRadius: '99px', 
+                border: '1px solid #818cf8', 
+                background: 'white', 
+                color: '#4f46e5',
+                cursor: 'pointer'
             }} 
             onClick={
                 () => followUser(user)
