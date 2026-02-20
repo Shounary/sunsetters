@@ -57,7 +57,7 @@ async function followUser(payload: UserEventPayload) {
   console.log(`Adding a new follower to ${payload.targetUserID}`);
   console.log(`New followers array: ${updatedFollowers}`);
 
-  client.models.UserProfile.update({
+  await client.models.UserProfile.update({
       id: targetUser.id,
       followers: updatedFollowers
   }).catch((error) => {
