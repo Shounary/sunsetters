@@ -52,13 +52,16 @@ async function followUser(payload: UserEventPayload) {
   }
 
   const updatedFollowers = targetUser.followers
+  console.log(`User ${payload.targetUserID} has these followers: ${targetUser.followers}`);
   updatedFollowers?.push(payload.originUserID)
-
   console.log(`Adding a new follower to ${payload.targetUserID}`);
+  console.log(`New followers array: ${updatedFollowers}`);
 
   client.models.UserProfile.update({
       id: targetUser.id,
       followers: updatedFollowers
+  }).catch((error) => {
+    throw error
   })
 }
 
