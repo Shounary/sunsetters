@@ -1,7 +1,7 @@
 import { type ClientSchema, a, defineData } from "@aws-amplify/backend";
-// import { postConfirmation } from '../auth/post-confirmation/resource';
-// import { userEvents } from '../functions/user-events/resource'
-// import { fanoutWorker } from "../functions/fanout-worker/resource";
+import { postConfirmation } from '../auth/post-confirmation/resource';
+import { userEvents } from '../functions/user-events/resource'
+import { fanoutWorker } from "../functions/fanout-worker/resource";
 
 /*== STEP 1 ===============================================================
 The section below creates a Todo database table with a "content" field. Try
@@ -19,7 +19,7 @@ const schema = a.schema({
     content: a.string(),
     imagePath: a.string(),
   })
-  .authorization((allow) => [allow.publicApiKey()]),
+  .authorization((allow) => [allow.authenticated()]),
   
 
   UserProfile: a
@@ -31,7 +31,7 @@ const schema = a.schema({
     followers: a.string().required().array(),
     follows: a.string().required().array()
   })
-  .authorization((allow) => [allow.publicApiKey()]),
+  .authorization((allow) => [allow.authenticated()]),
 
   FeedPost: a.
   model({
@@ -39,31 +39,31 @@ const schema = a.schema({
     owner: a.string().required(),
     wasViewed: a.boolean().default(false)
   })
-  .authorization((allow) => [allow.publicApiKey()]),
+  .authorization((allow) => [allow.owner()]),
 
   UserPost: a.
   model({
     postID: a.string().required()
   })
-  .authorization((allow) => [allow.publicApiKey()]),
+  .authorization((allow) => [allow.owner()]),
 
   userEvent: a.mutation()
   .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
-  // .handler(a.handler.function(userEvents))
+  .handler(a.handler.function(userEvents))
   .returns(a.boolean()),
 
 })
 
+.authorization(allow => [
+  allow.authenticated(),
+  allow.resource(postConfirmation),
+  allow.resource(userEvents),
+  allow.resource(fanoutWorker),
+]);
 
 
 
 
-// .authorization(allow => [
-//   allow.authenticated(),
-//   allow.resource(postConfirmation),
-//   allow.resource(userEvents),
-//   allow.resource(fanoutWorker),
-// ]);
 
 export type Schema = ClientSchema<typeof schema>;
 
