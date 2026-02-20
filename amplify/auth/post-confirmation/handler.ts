@@ -12,11 +12,11 @@ Amplify.configure(resourceConfig, libraryOptions);
 const client = generateClient<Schema>();
 
 export const handler: PostConfirmationTriggerHandler = async (event) => {
-  const { sub, fullname } = event.request.userAttributes;
+  const { sub, givenName } = event.request.userAttributes;
 
   await client.models.UserProfile.create({
     id: sub, // Use Cognito 'sub' as the DB primary key
-    name: fullname ?? "~missing name~", 
+    name: givenName ?? "~missing name~", 
     imagePath: "default-profile-pictures/default-pfp1.png",
     owner: sub,
     followers: [],

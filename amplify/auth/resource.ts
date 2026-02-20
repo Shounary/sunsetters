@@ -7,7 +7,7 @@ import { postConfirmation } from './post-confirmation/resource';
  */
 export const auth = defineAuth({
   userAttributes: {
-    fullname: {
+    givenName: {
       mutable: true,
       required: true
     }

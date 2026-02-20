@@ -9,9 +9,34 @@ import '@aws-amplify/ui-react/styles.css';
 
 Amplify.configure(outputs);
 
+const formFields = {
+  signUp: {
+    given_name: {
+      order: 1,
+      placeholder: 'Enter Your Full Name Here',
+      isRequired: true,
+      label: 'Full Name'
+    },
+
+    email: {
+      order: 2,
+      placeholder: 'Enter Your Email Here',
+      isRequired: true,
+      label: 'Email:'
+    },
+
+    password: {
+      order: 5
+    },
+    confirm_password: {
+      order: 6
+    }
+  }
+}
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Authenticator>
+    <Authenticator formFields={formFields}>
       <App />
     </Authenticator>
   </React.StrictMode>
