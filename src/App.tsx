@@ -56,9 +56,11 @@ function App() {
         const { data: users } =  await client.models.UserProfile.list({
             limit: 10
         })
+
+        console.log(`Current user follows: ${userProfile?.follows}`)
         
         const unfollowedUsers = users
-            .filter(user => !userProfile?.followers?.includes(user.id))
+            .filter(user => !userProfile?.follows?.includes(user.id))
         
         return unfollowedUsers
     }
