@@ -80,7 +80,7 @@ function App() {
     const [currentTab, setCurrentTab] = useState("Feed");
 
 
-    
+
 
     // FILE UPLOAD
     const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,6 +247,72 @@ function App() {
     }, [])
 
 
+    // const renderContent = () => {
+    //     switch (currentTab) {
+    //         case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
+    //         case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
+    //         case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
+    //         default: return null;
+    //     }
+    // };
+
+    // return (
+    //     <main>
+    //     <div>------</div>
+    //     <div>------</div>
+    //     <div>------</div>
+    //     <div>------</div>
+    //     <div>------</div>
+    //     <h1>Welcome {user?.signInDetails?.loginId}</h1>
+    //     <div>
+    //         {userProfile?.imagePath && (
+    //         <AvatarImage imagePath={userProfile.imagePath} />
+    //         )}
+    //     </div>
+    //     <h2>Image: {userProfile?.imagePath}</h2>
+
+    //     <form onSubmit={handleUpload}>
+    //         <div>
+    //             <label>Text:</label>
+    //             <input 
+    //                 type="text" 
+    //                 name="textInput"
+    //                 value={newPost.textInput} 
+    //                 onChange={handleNewPostChange} 
+    //             />
+    //         </div>
+
+    //         <div>
+    //             <label>Media:</label>
+    //             <input 
+    //                 type="file" 
+    //                 name="imageInput" 
+    //                 onChange={handleNewPostChange} 
+    //             />
+    //         </div>
+
+    //         <button type="submit">Post</button>
+    //     </form>
+    //     <button onClick={ signOut }>SIGN OUT</button>
+
+    //     <div className="app-container">
+    //     <div className="header-section">
+    //         <h1 className="title">
+    //         Sun<span className="highlight">Setters</span>
+    //         </h1>
+            
+    //         <NavigationBar 
+    //         tabs={["Feed", "My Posts", "Follows"]} 
+    //         activeTab={currentTab} 
+    //         onTabChange={setCurrentTab} 
+    //         />
+    //     </div>
+
+    //     {renderContent()}
+    //     </div>
+    //     </main>
+    // );
+
     const renderContent = () => {
         switch (currentTab) {
             case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
@@ -257,59 +323,76 @@ function App() {
     };
 
     return (
-        <main>
-        <div>------</div>
-        <div>------</div>
-        <div>------</div>
-        <div>------</div>
-        <div>------</div>
-        <h1>Welcome {user?.signInDetails?.loginId}</h1>
-        <div>
-            {userProfile?.imagePath && (
-            <AvatarImage imagePath={userProfile.imagePath} />
-            )}
-        </div>
-        <h2>Image: {userProfile?.imagePath}</h2>
-
-        <form onSubmit={handleUpload}>
-            <div>
-                <label>Text:</label>
-                <input 
-                    type="text" 
-                    name="textInput"
-                    value={newPost.textInput} 
-                    onChange={handleNewPostChange} 
-                />
-            </div>
-
-            <div>
-                <label>Media:</label>
-                <input 
-                    type="file" 
-                    name="imageInput" 
-                    onChange={handleNewPostChange} 
-                />
-            </div>
-
-            <button type="submit">Post</button>
-        </form>
-        <button onClick={ signOut }>SIGN OUT</button>
-
-        <div className="app-container">
-        <div className="header-section">
-            <h1 className="title">
-            Sun<span className="highlight">Setters</span>
-            </h1>
+        <main className="app-container">
             
-            <NavigationBar 
-            tabs={["Feed", "My Posts", "Follows"]} 
-            activeTab={currentTab} 
-            onTabChange={setCurrentTab} 
-            />
-        </div>
+            {/* Top Bar: User Profile & Sign Out */}
+            <div className="top-profile-bar">
+                <div className="user-info">
+                    {userProfile?.imagePath ? (
+                        <div className="avatar-wrapper">
+                            <AvatarImage imagePath={userProfile.imagePath} />
+                        </div>
+                    ) : (
+                        <div className="avatar placeholder" />
+                    )}
+                    <div className="user-details">
+                        <h2 className="welcome-text">Welcome, {user?.signInDetails?.loginId}</h2>
+                    </div>
+                </div>
+                <button className="btn-secondary" onClick={signOut}>SIGN OUT</button>
+            </div>
 
-        {renderContent()}
-        </div>
+            <div className="header-section">
+                
+                {/* App Title */}
+                <h1 className="title">
+                    Sun<span className="highlight">Setters</span>
+                </h1>
+
+                {/* Create Post Form (Above Navigation) */}
+                <div className="create-post-card">
+                    <form onSubmit={handleUpload} className="create-post-form">
+                        <div className="input-group">
+                            <input 
+                                type="text" 
+                                name="textInput"
+                                value={newPost.textInput} 
+                                onChange={handleNewPostChange} 
+                                placeholder="Have you seen a sunset?"
+                                className="text-input"
+                                required
+                            />
+                        </div>
+
+                        <div className="form-actions">
+                            <div className="file-input-wrapper">
+                                <input 
+                                    type="file" 
+                                    name="imageInput" 
+                                    onChange={handleNewPostChange} 
+                                    className="file-input"
+                                    id="file-upload"
+                                />
+                                <label htmlFor="file-upload" className="file-label">
+                                    📷 Attach Media
+                                </label>
+                            </div>
+                            
+                            <button type="submit" className="btn-primary">Post</button>
+                        </div>
+                    </form>
+                </div>
+                
+                {/* Navigation Bar */}
+                <NavigationBar 
+                    tabs={["Feed", "My Posts", "Follows"]} 
+                    activeTab={currentTab} 
+                    onTabChange={setCurrentTab} 
+                />
+            </div>
+
+            {/* Scrollable Content */}
+            {renderContent()}
         </main>
     );
 
