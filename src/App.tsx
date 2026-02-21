@@ -211,6 +211,7 @@ function App() {
         });
     }
 
+    // USERS TO FOLLOW DISPLAY
     const extractUsersToFollow = async (currentUser: Schema["UserProfile"]["type"]) => {
         const usersToFollow = await fetchUsersToFollow(currentUser)
         usersToFollow.forEach(async u => {
@@ -230,15 +231,6 @@ function App() {
         const postSub = client.models.UserPost.observeQuery().subscribe({
             next: () => extractPosts(),
         })
-
-        // const feedSub = client.models.FeedPost.observeQuery({
-        //     filter: {
-        //         id: { eq: user.userId }
-        //     }
-        // }).subscribe({
-        //     next: () => extractFeed(),
-        // })
-
         
         const userSub = client.models.UserProfile.observeQuery({
             filter: { 
@@ -256,7 +248,6 @@ function App() {
 
         return () => {
             postSub.unsubscribe()
-            // feedSub.unsubscribe()
             userSub.unsubscribe()
         }
     }, [])
@@ -317,58 +308,6 @@ function App() {
         </div>
         </main>
     );
-    
-    // return (
-    //     <main>
-    //         <h1>Welcome {user?.signInDetails?.loginId}</h1>
-    //         <div>
-    //             {userProfile?.imagePath && (
-    //             <AvatarImage imagePath={userProfile.imagePath} />
-    //             )}
-    //         </div>
-    //         <h2>Image: {userProfile?.imagePath}</h2>
-    //         <button onClick={ signOut }>SIGN OUT</button>
-
-    //         <form onSubmit={handleUpload}>
-    //             <div>
-    //                 <label>Text:</label>
-    //                 <input 
-    //                     type="text" 
-    //                     name="textInput"
-    //                     value={newPost.textInput} 
-    //                     onChange={handleNewPostChange} 
-    //                 />
-    //             </div>
-
-    //             <div>
-    //                 <label>Media:</label>
-    //                 <input 
-    //                     type="file" 
-    //                     name="imageInput" 
-    //                     onChange={handleNewPostChange} 
-    //                 />
-    //             </div>
-
-    //             <button type="submit">Post</button>
-    //         </form>
-
-    //         <ul>
-    //             {feedDisplay.map((displayPost) => (<li
-    //                 onClick={() => deletePost(displayPost.id)}
-    //                 key={displayPost.id}>
-    //                 <div className="image-container">
-    //                     <img 
-    //                         src={displayPost.mediaURLs[0].toString()} 
-    //                         alt={displayPost.mediaURLs[0].toString()} 
-    //                         style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
-    //                     />
-    //                     <h3>{displayPost.content}</h3>
-    //                 </div>
-    //             </li>
-    //             ))}
-    //         </ul>
-    //     </main>
-    // );
 
 }
 
@@ -385,10 +324,6 @@ const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
               <div className="user-info">
                 <div 
                   className="avatar" 
-                //   style={{ 
-                //     // Alternate colors for variety
-                //     background: i % 3 === 0 ? '#ec4899' : i % 3 === 1 ? '#8b5cf6' : '#3b82f6' 
-                //   }} 
                 />
                 <div>
                   <h4 style={{ margin: 0, fontSize: '0.9rem' }}>{post.id}</h4>
