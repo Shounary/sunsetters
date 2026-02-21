@@ -52,15 +52,13 @@ function App() {
         return sortedFeed
     }
 
-    async function fetchUsersToFollow() {
+    async function fetchUsersToFollow(currentUser: Schema["UserProfile"]["type"]) {
         const { data: users } =  await client.models.UserProfile.list({
             limit: 10
         })
 
-        console.log(`Current user follows: ${userProfile?.follows}`)
-        
         const unfollowedUsers = users
-            .filter(user => !userProfile?.follows?.includes(user.id))
+            .filter(user => !currentUser.follows?.includes(user.id) && user.id !== currentUser.id)
         
         return unfollowedUsers
     }
@@ -213,8 +211,8 @@ function App() {
         });
     }
 
-    const extractUsersToFollow = async () => {
-        const usersToFollow = await fetchUsersToFollow()
+    const extractUsersToFollow = async (currentUser: Schema["UserProfile"]["type"]) => {
+        const usersToFollow = await fetchUsersToFollow(currentUser)
         usersToFollow.forEach(async u => {
             setUsersToFollow([])
             if (!u) return
@@ -247,11 +245,12 @@ function App() {
                 id: { eq: user.userId } 
             }
         }).subscribe({
-            next: ({ items }) => {
+            next: async ({ items }) => {
+                const fetchedUserProfile = items[0]
                 console.log(`Fetching user by id: ${user.userId}`)
-                setUserProfile(items[0]);
-                extractFeed()
-                extractUsersToFollow()
+                await setUserProfile(fetchedUserProfile);
+                await extractFeed()
+                await extractUsersToFollow(fetchedUserProfile)
             }
         })
 
