@@ -5,8 +5,9 @@ import { getUrl, uploadData } from "aws-amplify/storage";
 // import { remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost, UserDisplay } from "./DataTypes";
-import { AvatarImage, FollowButton } from "./DisplayTypes";
+import { AvatarImage } from "./DisplayTypes";
 import { UserEvent } from "../amplify/functions/common/types";
+import { FeedView, MyPostsView, FollowsView } from "./DisplayTypes";
 import NavigationBar from "./NavigationBar";
 
 function App() {
@@ -75,18 +76,11 @@ function App() {
     const [userProfile, setUserProfile] = useState<Schema["UserProfile"]["type"]>()
     const { user, signOut } = useAuthenticator()
 
-    // // FRONTEND
+    // FRONTEND
     const [currentTab, setCurrentTab] = useState("Feed");
 
-    const renderContent = () => {
-        switch (currentTab) {
-            case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
-            case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
-            case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
-            default: return null;
-        }
-    };
 
+    
 
     // FILE UPLOAD
     const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -252,6 +246,16 @@ function App() {
         }
     }, [])
 
+
+    const renderContent = () => {
+        switch (currentTab) {
+            case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
+            case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
+            case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
+            default: return null;
+        }
+    };
+
     return (
         <main>
         <div>------</div>
@@ -310,121 +314,5 @@ function App() {
     );
 
 }
-
-const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
-  return (
-    // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
-    <div className="feed-mask view-wrapper">
-      
-      {/* 3. The Scroll Container */}
-      <div className="feed-scroll-view">
-        {feedDisplay.map((post: PostDisplay) => (
-          <div key={post.id} className="feed-card">
-            <div className="card-header">
-              <div className="user-info">
-                <div 
-                  className="avatar" 
-                />
-                <div>
-                  <h4 style={{ margin: 0, fontSize: '0.9rem' }}>{post.id}</h4>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#6b7280' }}>
-                    {10}m ago
-                  </p>
-                </div>
-              </div>
-              <span style={{ color: '#9ca3af' }}>•••</span>
-            </div>
-            
-            <img 
-                src={post.mediaURLs[0].toString()} 
-                alt={post.mediaURLs[0].toString()} 
-                style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
-            />
-            
-            <div style={{ display: 'flex', gap: '1.5rem', color: '#4b5563', fontSize: '0.9rem' }}>
-               <span style={{ cursor: 'pointer' }}>❤️ {100}</span>
-               <span style={{ cursor: 'pointer' }}>💬 {20}</span>
-               <span style={{ cursor: 'pointer' }}>↗️ Share</span>
-            </div>
-          </div>
-        ))}
-        
-        {/* End of list spacer */}
-        <div style={{ height: '20px' }}></div>
-      </div>
-    </div>
-  );
-};
-
-const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
-  // 1. Create a larger list of items to ensure scrolling triggers
-
-  return (
-    // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
-    <div className="feed-mask view-wrapper">
-      
-      {/* 3. The Scroll Container */}
-      <div className="feed-scroll-view">
-        {postsDisplay.map((post: PostDisplay) => (
-          <div key={post.id} className="feed-card">
-            <div className="card-header">
-              <div className="user-info">
-                <div 
-                  className="avatar" 
-                //   style={{ 
-                //     // Alternate colors for variety
-                //     background: i % 3 === 0 ? '#ec4899' : i % 3 === 1 ? '#8b5cf6' : '#3b82f6' 
-                //   }} 
-                />
-                <div>
-                  <h4 style={{ margin: 0, fontSize: '0.9rem' }}>{post.id}</h4>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#6b7280' }}>
-                    {10}m ago
-                  </p>
-                </div>
-              </div>
-              <span style={{ color: '#9ca3af' }}>•••</span>
-            </div>
-            
-            <img 
-                src={post.mediaURLs[0].toString()} 
-                alt={post.mediaURLs[0].toString()} 
-                style={{ width: '100%', height: '250px', borderRadius: '8px' }} 
-            />
-
-            {post.content}
-            
-            <div style={{ display: 'flex', gap: '1.5rem', color: '#4b5563', fontSize: '0.9rem' }}>
-               <span style={{ cursor: 'pointer' }}>❤️ {100}</span>
-               <span style={{ cursor: 'pointer' }}>💬 {20}</span>
-               <span style={{ cursor: 'pointer' }}>↗️ Share</span>
-            </div>
-          </div>
-        ))}
-        
-        {/* End of list spacer */}
-        <div style={{ height: '20px' }}></div>
-      </div>
-    </div>
-  );
-};
-
-const FollowsView = ( { users, followUser } : { users: UserDisplay[], followUser: (targetUserID: string) => Promise<void> }) => (
-    <div className="view-wrapper">
-        {users.map(user => (
-        <div key={user.id} className="list-item">
-            <div className="user-info">
-            {/* <div className="avatar" style={{ background: i % 2 === 0 ? '#818cf8' : '#f472b6' }} /> */}
-            <div> <img className="avatar" src={user.profilePicture.toString()} alt="pfp" /></div>
-            <div>
-                <h4 style={{ margin: 0 }}>{user.name}</h4>
-                <small style={{ color: '#6b7280' }}>@user_{user.name.split(' ')[0].toLowerCase()}</small>
-            </div>
-            </div>
-            <FollowButton onClick={followUser} userID = {user.id}></FollowButton>
-        </div>
-        ))}
-    </div>
-);
 
 export default App;
