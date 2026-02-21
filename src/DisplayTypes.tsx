@@ -54,10 +54,10 @@ export function FollowButton({ onClick, userID }: { onClick: (targetUserID: stri
 
 export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
   return (
-    // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
+    // Wrap in the 'feed-mask' for the visual fade effect at the bottom
     <div className="feed-mask view-wrapper">
       
-      {/* 3. The Scroll Container */}
+      {/* The Scroll Container */}
       <div className="feed-scroll-view">
         {feedDisplay.map((post: PostDisplay) => (
           <div key={post.id} className="feed-card">
@@ -98,13 +98,11 @@ export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
 };
 
 export const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
-  // 1. Create a larger list of items to ensure scrolling triggers
-
   return (
-    // 2. Wrap in the 'feed-mask' for the visual fade effect at the bottom
+    // Wrap in the 'feed-mask' for the visual fade effect at the bottom
     <div className="feed-mask view-wrapper">
       
-      {/* 3. The Scroll Container */}
+      {/* The Scroll Container */}
       <div className="feed-scroll-view">
         {postsDisplay.map((post: PostDisplay) => (
           <div key={post.id} className="feed-card">
@@ -155,7 +153,6 @@ export const FollowsView = ( { users, followUser } : { users: UserDisplay[], fol
         {users.map(user => (
         <div key={user.id} className="list-item">
             <div className="user-info">
-            {/* <div className="avatar" style={{ background: i % 2 === 0 ? '#818cf8' : '#f472b6' }} /> */}
             <div> <img className="avatar" src={user.profilePicture.toString()} alt="pfp" /></div>
             <div>
                 <h4 style={{ margin: 0 }}>{user.name}</h4>
