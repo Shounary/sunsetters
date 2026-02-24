@@ -325,31 +325,33 @@ function App() {
     return (
         <main className="app-container">
             
-            {/* Top Bar: User Profile & Sign Out */}
-            <div className="top-profile-bar">
-                <div className="user-info">
-                    {userProfile?.imagePath ? (
-                        <div className="avatar-wrapper">
-                            <AvatarImage imagePath={userProfile.imagePath} />
-                        </div>
-                    ) : (
-                        <div className="avatar placeholder" />
-                    )}
-                    <div className="user-details">
-                        <h2 className="welcome-text">Welcome, {user?.signInDetails?.loginId}</h2>
-                    </div>
-                </div>
-                <button className="btn-secondary" onClick={signOut}>SIGN OUT</button>
-            </div>
-
-            <div className="header-section">
-                
-                {/* App Title */}
-                <h1 className="title">
+            {/* 1. Unified Full-Width Header */}
+            <header className="main-top-header">
+                {/* Left Side: App Title */}
+                <h1 className="header-title">
                     Sun<span className="highlight">Setters</span>
                 </h1>
 
-                {/* Create Post Form (Above Navigation) */}
+                {/* Right Side: Profile & Actions */}
+                <div className="header-actions">
+                    <div className="user-info">
+                        {userProfile?.imagePath ? (
+                            <div className="avatar-wrapper">
+                                <AvatarImage imagePath={userProfile.imagePath} />
+                            </div>
+                        ) : (
+                            <div className="avatar placeholder" />
+                        )}
+                        <div className="user-details">
+                            <h2 className="welcome-text">{user?.signInDetails?.loginId}</h2>
+                        </div>
+                    </div>
+                    <button className="btn-secondary" onClick={signOut}>Sign Out</button>
+                </div>
+            </header>
+
+            {/* 2. Centered Interactive Section (Form & Nav) */}
+            <div className="interactive-section">
                 <div className="create-post-card">
                     <form onSubmit={handleUpload} className="create-post-form">
                         <div className="input-group">
@@ -358,7 +360,7 @@ function App() {
                                 name="textInput"
                                 value={newPost.textInput} 
                                 onChange={handleNewPostChange} 
-                                placeholder="Have you seen a sunset?"
+                                placeholder="What's on your mind?"
                                 className="text-input"
                                 required
                             />
@@ -383,7 +385,6 @@ function App() {
                     </form>
                 </div>
                 
-                {/* Navigation Bar */}
                 <NavigationBar 
                     tabs={["Feed", "My Posts", "Follows"]} 
                     activeTab={currentTab} 
@@ -391,8 +392,11 @@ function App() {
                 />
             </div>
 
-            {/* Scrollable Content */}
-            {renderContent()}
+            {/* 3. Scrollable Content Area */}
+            <div className="main-content-scroll-area">
+                {renderContent()}
+            </div>
+            
         </main>
     );
 
