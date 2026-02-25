@@ -104,7 +104,8 @@ function App() {
         client.models.Post.create({
             // timestamp: new Date().getUTCDate().toString()
             owner: user.userId,
-            content: newPost.textInput
+            content: newPost.textInput,
+            likes: []
         }).then((post) => {
             if (!post.data) {
                 console.warn("Post contains empty data!");

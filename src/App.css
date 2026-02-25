@@ -7,6 +7,11 @@ html, body, #root {
   box-sizing: border-box;
 }
 
+button:focus:not(:focus-visible) {
+  outline: none;
+  box-shadow: none;
+}
+
 /* --- THEME VARIABLES --- */
 :root {
   /* 1. Core Hex Colors */
@@ -500,10 +505,6 @@ html, body, #root {
   color: white;
 }
 
-.post-action-btn.heart:hover {
-  color: var(--color-highlight); 
-}
-
 .follow-user-name {
   margin: 0;
   color: white;
@@ -511,4 +512,51 @@ html, body, #root {
 
 .follow-user-handle {
   color: var(--color-dark-blue); 
+}
+
+/* --- LIKE BUTTON COMPONENT --- */
+.like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-dark-blue); /* Matches the other icons */
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.like-btn:hover {
+  color: white; /* Brightens on hover */
+}
+
+.like-btn.liked {
+  color: var(--color-highlight); /* Turns Orange/Yellow when liked */
+}
+
+.sun-icon {
+  width: 18px;
+  height: 18px;
+  /* Gives the sun a bouncy "pop" effect */
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.like-btn:active .sun-icon {
+  transform: scale(0.8);
+}
+
+.like-btn.liked .sun-icon {
+  /* Renamed animation for clarity */
+  animation: sunPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* You can optionally rename the keyframe from heartPop to sunPop too! */
+@keyframes sunPop {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.4) rotate(15deg); } /* Added a little spin to the sun! */
+  100% { transform: scale(1) rotate(0deg); }
 }

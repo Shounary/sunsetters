@@ -18,6 +18,7 @@ const schema = a.schema({
     owner: a.string().required(),
     content: a.string(),
     imagePath: a.string(),
+    likes: a.string().required().array().required()
   })
   .authorization((allow) => [allow.authenticated()]),
   
@@ -28,8 +29,8 @@ const schema = a.schema({
     name: a.string().required(),
     imagePath: a.string().required(),
     owner: a.string(),
-    followers: a.string().required().array(),
-    follows: a.string().required().array()
+    followers: a.string().required().array().required(),
+    follows: a.string().required().array().required()
   })
   .authorization((allow) => [allow.authenticated()]),
 

@@ -41,6 +41,52 @@ export function FollowButton({ onClick, userID }: { onClick: (targetUserID: stri
   );
 }
 
+export function LikeButton({ initialLikes = 0, onLike }: { initialLikes?: number, onLike?: (liked: boolean) => void }) {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState(initialLikes);
+
+  const handleToggleLike = () => {
+    const newState = !isLiked;
+    setIsLiked(newState);
+    setLikes(newState ? likes + 1 : likes - 1);
+    
+    if (onLike) {
+      onLike(newState);
+    }
+  };
+
+  return (
+    <button 
+      className={`like-btn ${isLiked ? 'liked' : ''}`} 
+      onClick={handleToggleLike}
+    >
+      <svg 
+        className="sun-icon" 
+        viewBox="0 0 24 24" 
+        fill={isLiked ? "currentColor" : "none"} 
+        stroke="currentColor" 
+        strokeWidth="2.5" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      >
+        {/* The center body of the sun */}
+        <circle cx="12" cy="12" r="5" />
+        
+        {/* The 8 sun rays */}
+        <line x1="12" y1="1" x2="12" y2="3" />
+        <line x1="12" y1="21" x2="12" y2="23" />
+        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+        <line x1="1" y1="12" x2="3" y2="12" />
+        <line x1="21" y1="12" x2="23" y2="12" />
+        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+      </svg>
+      <span className="like-count">{likes}</span>
+    </button>
+  );
+}
+
 export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
   return (
     <div className="feed-mask view-wrapper">
@@ -65,7 +111,7 @@ export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
             />
             
             <div className="post-actions">
-               <span className="post-action-btn heart">❤️ {100}</span>
+               <LikeButton initialLikes={Math.floor(Math.random() * 50) + 10} />
                <span className="post-action-btn">💬 {20}</span>
                <span className="post-action-btn">↗️ Share</span>
             </div>
@@ -108,7 +154,7 @@ export const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] })
             
             {/* Added a custom style to override margin-top if needed, or you can just let .post-actions handle it */}
             <div className="post-actions" style={{ marginTop: 0 }}>
-               <span className="post-action-btn heart">❤️ {100}</span>
+               <LikeButton initialLikes={Math.floor(Math.random() * 50) + 10} />
                <span className="post-action-btn">💬 {20}</span>
                <span className="post-action-btn">↗️ Share</span>
             </div>
