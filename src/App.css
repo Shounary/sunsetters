@@ -434,3 +434,103 @@ html, body, #root {
   padding: 2rem 1rem 1rem; /* Replaces the old huge padding-top */
   flex-shrink: 0;
 }
+
+
+
+
+
+
+
+
+/* --- 7. DISPLAY TYPES COMPONENTS --- */
+
+/* Avatar Image Component */
+.avatar-image-large {
+  width: 500px; /* Kept your sizing, though you may want to reduce this! */
+  height: 500px;
+  border-radius: 50%;
+  object-fit: cover; 
+}
+
+/* Follow Button */
+.btn-follow {
+  padding: 4px 12px;
+  border-radius: 99px;
+  border: 1px solid var(--bg-gradient-start); /* Light Blue */
+  background: var(--bg-gradient-mid); /* Med Blue */
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.btn-follow.active {
+  border: 1px solid var(--primary-highlight); /* Orange */
+  background: var(--primary-highlight);
+  color: var(--bg-gradient-end); /* Dark Blue */
+}
+
+/* Post Typography & Elements */
+.post-author-name {
+  margin: 0;
+  font-size: 0.9rem;
+  color: white;
+}
+
+.post-time {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--bg-gradient-start); /* Light Blue */
+}
+
+.post-options-icon {
+  color: var(--bg-gradient-mid); /* Med Blue */
+}
+
+.post-media-img {
+  width: 100%;
+  height: 250px;
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+  object-fit: cover;
+}
+
+.post-text-content {
+  color: white;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+/* Post Interaction Buttons */
+.post-actions {
+  display: flex;
+  gap: 1.5rem;
+  color: var(--bg-gradient-start); /* Light Blue */
+  font-size: 0.9rem;
+  margin-top: 1rem; /* Included from FeedView */
+}
+
+.post-action-btn {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+/* CSS Hover states replace your onMouseOver events! */
+.post-action-btn:hover {
+  color: white;
+}
+
+.post-action-btn.heart:hover {
+  color: var(--primary-highlight); /* Orange hover for heart */
+}
+
+/* Follows View Specifics */
+.follow-user-name {
+  margin: 0;
+  color: white;
+}
+
+.follow-user-handle {
+  color: var(--bg-gradient-start); /* Light Blue */
+}
