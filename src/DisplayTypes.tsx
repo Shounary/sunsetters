@@ -17,7 +17,7 @@ export function AvatarImage({ imagePath }: { imagePath: string }) {
     fetchUrl();
   }, [imagePath]);
 
-  return <img src={src} alt="User Avatar" className="avatar-image-large" />;
+  return <img src={src} alt="User Avatar" className="avatar-image" />;
 }
 
 export function FollowButton({ onClick, userID }: { onClick: (targetUserID: string) => Promise<void>, userID: string }) {
