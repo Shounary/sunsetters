@@ -1,4 +1,3 @@
-
 html, body, #root {
   margin: 0;
   padding: 0;
@@ -8,72 +7,59 @@ html, body, #root {
   box-sizing: border-box;
 }
 
+/* --- THEME VARIABLES --- */
 :root {
-  --primary-highlight: #F7AF4B; 
-  
-  --bg-gradient-start: #A7CCED; /* Light Blue */
-  --bg-gradient-mid: #82A0BC;   /* Medium Blue */
-  --bg-gradient-end: #545E75;   /* Dark Blue */
+  /* 1. Core Hex Colors */
+  --color-highlight: #F7AF4B;   /* Orange/Yellow */
+  --color-light-blue: #A7CCED;
+  --color-mid-blue: #82A0BC;
+  --color-dark-blue: #545E75;
+
+  /* 2. Core RGB Channels (Allows for transparent rgba() usage) */
+  --rgb-highlight: 247, 175, 75;
+  --rgb-light-blue: 167, 204, 237;
+  --rgb-mid-blue: 130, 160, 188;
+  --rgb-dark-blue: 84, 94, 117;
   
   --shadow-nav: 0 8px 30px rgba(0, 0, 0, 0.12);
 }
 
+/* --- MAIN LAYOUT --- */
 .app-container {
   height: 100vh; 
   width: 100%;
   overflow: hidden; 
   display: flex;
   flex-direction: column; 
-  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+  /* Deep Dark Blue background */
+  background: linear-gradient(135deg, #3d4556, var(--color-dark-blue));
 }
 
+/* --- HEADER --- */
 .main-top-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 100%;
   padding: 1rem 2rem;
-  background: rgba(167, 204, 237, 0.4); 
+  /* Dark Blue glass */
+  background: rgba(var(--rgb-dark-blue), 0.8); 
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(130, 160, 188, 0.5);
+  border-bottom: 1px solid rgba(var(--rgb-mid-blue), 0.5);
   flex-shrink: 0;
   z-index: 50;
 }
 
-.title {
-  font-size: 2rem;
+.header-title {
+  font-size: 1.5rem; 
   font-weight: 800;
-  color: #1f2937;
+  color: white; /* Bright text on dark header */
+  margin: 0;
   letter-spacing: -0.025em;
 }
 
 .highlight {
-  color: var(--primary-highlight);
-}
-
-.main-content-scroll-area {
-  flex: 1; /* Take up all remaining vertical space */
-  overflow-y: auto; /* Allow vertical scrolling inside this box ONLY */
-  width: 100%;
-  padding-bottom: 2rem;
-  scroll-behavior: smooth;
-}
-
-.main-content-scroll-area::-webkit-scrollbar {
-  display: none;
-}
-.main-content-scroll-area {
-  scrollbar-width: none;
-}
-
-
-/* --- HEADER --- */
-.header-title {
-  font-size: 1.5rem; 
-  font-weight: 800;
-  color: var(--bg-gradient-end);
-  margin: 0;
-  letter-spacing: -0.025em;
+  color: var(--color-highlight);
 }
 
 .header-actions {
@@ -83,7 +69,7 @@ html, body, #root {
 }
 
 .header-section {
-  padding-top: 5rem; /* Space for the top profile bar */
+  padding-top: 5rem; 
   padding-bottom: 1rem;
   display: flex;
   flex-direction: column;
@@ -92,203 +78,15 @@ html, body, #root {
   flex-shrink: 0;
 }
 
-
-/* --- NAVBAR --- */
-.nav-pill {
-  position: relative;
-  display: flex;
-  align-items: center;
-  background-color: var(--bg-gradient-end);
-  border-radius: 9999px; 
-  padding: 0.5rem;
-  box-shadow: var(--shadow-nav);
-  border: 1px solid rgba(130, 160, 188, 0.5);
-  overflow: hidden; 
-}
-
-/* The subtle split-tone gloss effect */
-.nav-gloss {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  border-radius: 9999px;
-  background: linear-gradient(to bottom, rgba(167, 204, 237, 0.15), transparent);
-  pointer-events: none;
-}
-
-.nav-button {
-  position: relative;
-  z-index: 10;
-  padding: 0.75rem 2rem;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 0.875rem; 
-  font-weight: 600;
-  color: var(--bg-gradient-start);
-  transition: color 0.3s ease;
-}
-
-.nav-button:hover, .nav-button.active {
-  color: white;
-}
-
-.active-indicator {
-  position: absolute;
-  bottom: 0.25rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 50%;
-  height: 4px;
-  background-color: var(--primary-highlight);
-  border-radius: 9999px;
-  animation: fadeInBar 0.3s ease-out forwards;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scaleX(0.5); }
-  to { opacity: 1; transform: scaleX(1); }
-}
-
-@keyframes fadeInBar {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) scaleX(0.5); 
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) scaleX(1);
-  }
-}
-
-/* --- View Components --- */
-.view-wrapper {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 0 1rem;
-  animation: fadeIn 0.5s ease-out;
-}
-
-/* Feed Items */
-.feed-card {
-  border-radius: 1rem;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 0.75rem;
-}
-
-.user-info {
-  display: flex;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background: linear-gradient(45deg, #F7AF4B, #A7CCED); 
-}
-
-.card-image-placeholder {
-  height: 16rem;
-  background-color: #f3f4f6;
-  border-radius: 0.75rem;
-  margin-bottom: 0.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #d1d5db;
-}
-
-.card-image-placeholder, .grid-item {
-  background-color: var(--bg-gradient-mid);
-  color: var(--bg-gradient-end);
-}
-
-/* Grid View */
-.grid-layout {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.5rem;
-}
-
-.grid-item {
-  aspect-ratio: 1 / 1;
-  background-color: #e5e7eb;
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-
-.grid-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease;
-}
-
-.grid-item:hover .grid-image {
-  transform: scale(1.05);
-}
-
-/* List View */
-.list-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.75rem;
-  background: rgba(84, 94, 117, 0.85);
-  border-radius: 0.75rem;
-  border: 1px solid rgba(130, 160, 188, 0.4);
-  margin-bottom: 0.75rem;
-}
-
-/* --- SCROLLVIEW --- */
-
-.feed-scroll-view {
-  height: calc(100vh - 300px); 
-  min-height: 400px; 
-  overflow-y: auto;
-  scroll-behavior: smooth;
-  padding: 1rem 0.5rem; 
-}
-
-.feed-scroll-view {
-  scrollbar-width: none;
-}
-.feed-scroll-view::-webkit-scrollbar {
-  display: none;
-}
-
-.feed-mask {
-  position: relative;
-}
-.feed-mask::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 40px;
-  background: linear-gradient(to top, var(--bg-gradient-end), transparent);
-  pointer-events: none;
-  z-index: 20;
-}
-
-
-/* --- PROFILE BAR --- */
+/* --- PROFILE BAR (Legacy, but updated) --- */
 .top-profile-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.4);
+  background: rgba(var(--rgb-dark-blue), 0.8);
   backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   position: absolute;
   top: 0;
   left: 0;
@@ -314,24 +112,100 @@ html, body, #root {
 .welcome-text {
   font-size: 0.9rem;
   font-weight: 700;
-  color: var(--bg-gradient-end);
+  color: white;
   margin: 0;
 }
 
 .debug-text {
   font-size: 0.7rem;
-  color: #6b7280;
+  color: var(--color-light-blue);
 }
 
-/* --- POST FORM --- */
+/* --- NAVBAR --- */
+.nav-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--color-mid-blue); /* Medium Blue pill */
+  border-radius: 9999px; 
+  padding: 0.5rem;
+  box-shadow: var(--shadow-nav);
+  border: 1px solid rgba(var(--rgb-light-blue), 0.4);
+  overflow: hidden; 
+}
+
+.nav-gloss {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.15), transparent);
+  pointer-events: none;
+}
+
+.nav-button {
+  position: relative;
+  z-index: 10;
+  padding: 0.75rem 2rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.875rem; 
+  font-weight: 600;
+  color: var(--color-dark-blue); /* Dark blue when inactive */
+  transition: color 0.3s ease;
+}
+
+.nav-button:hover, .nav-button.active {
+  color: white; /* White when active */
+}
+
+.active-indicator {
+  position: absolute;
+  bottom: 0.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 4px;
+  background-color: var(--color-highlight);
+  border-radius: 9999px;
+  animation: fadeInBar 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scaleX(0.5); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes fadeInBar {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) scaleX(0.5); 
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) scaleX(1);
+  }
+}
+
+/* --- INTERACTIVE SECTION & CARDS --- */
+.interactive-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 2rem 1rem 1rem; 
+  flex-shrink: 0;
+}
+
 .create-post-card, .feed-card {
-  background: rgba(84, 94, 117, 0.95); 
+  /* Lighter Cards (Medium Blue) */
+  background: rgba(var(--rgb-mid-blue), 0.95); 
   border-radius: 1.5rem;
   padding: 1.5rem;
   width: 100%;
   max-width: 600px; 
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  border: 1px solid rgba(130, 160, 188, 0.4);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(var(--rgb-light-blue), 0.5); /* Light blue rim */
   margin-bottom: 1rem;
 }
 
@@ -341,24 +215,26 @@ html, body, #root {
   gap: 1rem;
 }
 
+/* --- INPUTS & LABELS --- */
 .text-input {
   width: 100%;
   padding: 1rem;
   border: none;
-  background: rgba(130, 160, 188, 0.5); 
+  /* Lightest element (Light Blue) for input field */
+  background: rgba(var(--rgb-light-blue), 0.9); 
   border-radius: 1rem;
   font-size: 1rem;
-  color: white;
+  color: var(--color-dark-blue); /* Dark blue typing text */
   outline: none;
   transition: box-shadow 0.2s;
 }
 
 .text-input:focus {
-  box-shadow: 0 0 0 2px var(--primary-highlight);
+  box-shadow: 0 0 0 2px var(--color-highlight);
 }
 
 .text-input::placeholder {
-  color: #A7CCED;
+  color: rgba(var(--rgb-dark-blue), 0.6); /* Dark blue placeholder */
 }
 
 .form-actions {
@@ -367,9 +243,8 @@ html, body, #root {
   align-items: center;
 }
 
-/* Custom File Input Styling */
 .file-input {
-  display: none; /* Hide the ugly default file picker */
+  display: none; 
 }
 
 .file-label {
@@ -377,8 +252,8 @@ html, body, #root {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: var(--bg-gradient-mid);
-  color: white;
+  background: var(--color-light-blue); /* Light blue button */
+  color: var(--color-dark-blue); /* Dark blue text */
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 600;
@@ -387,32 +262,31 @@ html, body, #root {
 }
 
 .file-label:hover {
-  background: var(--bg-gradient-start);
-  color: var(--bg-gradient-end);
+  background: white;
 }
 
 /* --- BUTTONS --- */
 .btn-primary {
-  background: linear-gradient(135deg, #F7AF4B, #e59d38); 
+  background: linear-gradient(135deg, var(--color-highlight), #e59d38); 
   color: white;
   border: none;
   padding: 0.6rem 1.5rem;
   border-radius: 9999px;
   font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(247, 175, 75, 0.3); 
+  box-shadow: 0 4px 10px rgba(var(--rgb-highlight), 0.3); 
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .btn-primary:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(247, 175, 75, 0.4);
+  box-shadow: 0 6px 15px rgba(var(--rgb-highlight), 0.4);
 }
 
 .btn-secondary {
-  background: var(--bg-gradient-mid);
+  background: var(--color-mid-blue);
   color: white;
-  border: 1px solid var(--bg-gradient-start);
+  border: 1px solid var(--color-light-blue);
   padding: 0.4rem 1rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -422,43 +296,151 @@ html, body, #root {
 }
 
 .btn-secondary:hover {
-  background: var(--bg-gradient-start);
-  color: var(--bg-gradient-end);
+  background: var(--color-light-blue);
+  color: var(--color-dark-blue);
 }
 
-.interactive-section {
+/* --- SCROLLVIEW & LIST ITEMS --- */
+.main-content-scroll-area {
+  flex: 1; 
+  overflow-y: auto; 
+  width: 100%;
+  padding-bottom: 2rem;
+  scroll-behavior: smooth;
+}
+
+.main-content-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+.main-content-scroll-area {
+  scrollbar-width: none;
+}
+
+.feed-scroll-view {
+  height: calc(100vh - 300px); 
+  min-height: 400px; 
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  padding: 1rem 0.5rem; 
+}
+
+.feed-scroll-view::-webkit-scrollbar {
+  display: none;
+}
+.feed-scroll-view {
+  scrollbar-width: none;
+}
+
+.feed-mask {
+  position: relative;
+}
+
+.feed-mask::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(to top, var(--color-dark-blue), transparent);
+  pointer-events: none;
+  z-index: 20;
+}
+
+.view-wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.feed-card {
+  border-radius: 1rem;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-  padding: 2rem 1rem 1rem; /* Replaces the old huge padding-top */
-  flex-shrink: 0;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
 }
 
+.user-info {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
 
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: linear-gradient(45deg, var(--color-highlight), var(--color-light-blue)); 
+}
 
+.card-image-placeholder, .grid-item {
+  background-color: var(--color-light-blue);
+  color: var(--color-dark-blue);
+}
 
+.card-image-placeholder {
+  height: 16rem;
+  border-radius: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.grid-layout {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
 
+.grid-item {
+  aspect-ratio: 1 / 1;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
 
+.grid-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.grid-item:hover .grid-image {
+  transform: scale(1.05);
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(var(--rgb-mid-blue), 0.85); /* Medium Blue glass */
+  border-radius: 0.75rem;
+  border: 1px solid rgba(var(--rgb-light-blue), 0.4);
+  margin-bottom: 0.75rem;
+}
 
 /* --- 7. DISPLAY TYPES COMPONENTS --- */
-
-/* Avatar Image Component */
 .avatar-image-large {
-  width: 500px; /* Kept your sizing, though you may want to reduce this! */
+  width: 500px; 
   height: 500px;
   border-radius: 50%;
   object-fit: cover; 
 }
 
-/* Follow Button */
 .btn-follow {
   padding: 4px 12px;
   border-radius: 99px;
-  border: 1px solid var(--bg-gradient-start); /* Light Blue */
-  background: var(--bg-gradient-mid); /* Med Blue */
-  color: white;
+  border: 1px solid var(--color-light-blue); 
+  background: var(--color-light-blue); /* Light Blue */
+  color: var(--color-dark-blue); /* Dark Blue */
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 600;
@@ -466,12 +448,11 @@ html, body, #root {
 }
 
 .btn-follow.active {
-  border: 1px solid var(--primary-highlight); /* Orange */
-  background: var(--primary-highlight);
-  color: var(--bg-gradient-end); /* Dark Blue */
+  border: 1px solid var(--color-highlight); 
+  background: var(--color-highlight);
+  color: var(--color-dark-blue); 
 }
 
-/* Post Typography & Elements */
 .post-author-name {
   margin: 0;
   font-size: 0.9rem;
@@ -481,11 +462,11 @@ html, body, #root {
 .post-time {
   margin: 0;
   font-size: 0.75rem;
-  color: var(--bg-gradient-start); /* Light Blue */
+  color: var(--color-dark-blue); /* Dark Blue accents */
 }
 
 .post-options-icon {
-  color: var(--bg-gradient-mid); /* Med Blue */
+  color: var(--color-dark-blue); 
 }
 
 .post-media-img {
@@ -502,13 +483,12 @@ html, body, #root {
   margin-bottom: 1rem;
 }
 
-/* Post Interaction Buttons */
 .post-actions {
   display: flex;
   gap: 1.5rem;
-  color: var(--bg-gradient-start); /* Light Blue */
+  color: var(--color-dark-blue); /* Dark Blue action icons */
   font-size: 0.9rem;
-  margin-top: 1rem; /* Included from FeedView */
+  margin-top: 1rem; 
 }
 
 .post-action-btn {
@@ -516,21 +496,19 @@ html, body, #root {
   transition: color 0.2s;
 }
 
-/* CSS Hover states replace your onMouseOver events! */
 .post-action-btn:hover {
   color: white;
 }
 
 .post-action-btn.heart:hover {
-  color: var(--primary-highlight); /* Orange hover for heart */
+  color: var(--color-highlight); 
 }
 
-/* Follows View Specifics */
 .follow-user-name {
   margin: 0;
   color: white;
 }
 
 .follow-user-handle {
-  color: var(--bg-gradient-start); /* Light Blue */
+  color: var(--color-dark-blue); 
 }
