@@ -74,7 +74,7 @@ function App() {
     const [usersToFollow, setUsersToFollow] = useState<Array<UserDisplay>>([])
 
     const [userProfile, setUserProfile] = useState<Schema["UserProfile"]["type"]>()
-    const { user } = useAuthenticator()
+    const { user, signOut } = useAuthenticator()
 
     // FRONTEND
     const [currentTab, setCurrentTab] = useState("Feed");
@@ -271,7 +271,7 @@ function App() {
 
                 {/* Right Side: Profile & Actions */}
                 <div className="header-actions">
-                    {/* <button className="btn-secondary" onClick={signOut}>Sign Out</button> */}
+                    <button className="btn-secondary" onClick={signOut}>Sign Out</button>
                     <div className="user-info">
                         {userProfile?.imagePath ? (
                             <div className="avatar-wrapper">
@@ -330,9 +330,9 @@ function App() {
             </div>
 
             {/* 3. Scrollable Content Area */}
-            {/* <div className="main-content-scroll-area"> */}
+            <div className="main-content-scroll-area">
                 {renderContent()}
-            {/* </div> */}
+            </div>
             
         </main>
     );

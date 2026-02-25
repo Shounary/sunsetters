@@ -303,7 +303,7 @@ html, body, #root {
 /* --- SCROLLVIEW & LIST ITEMS --- */
 .main-content-scroll-area {
   flex: 1; 
-  overflow-y: auto; 
+  overflow: hidden; 
   width: 100%;
   padding-bottom: 2rem;
   scroll-behavior: smooth;
@@ -317,9 +317,9 @@ html, body, #root {
 }
 
 .feed-scroll-view {
-  height: calc(100vh - 300px); 
+  height: calc(100vh - 350px); 
   min-height: 400px; 
-  overflow-y: auto;
+  overflow: auto;
   scroll-behavior: smooth;
   padding: 1rem 0.5rem; 
 }
