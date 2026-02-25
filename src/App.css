@@ -33,9 +33,9 @@ html, body, #root {
   align-items: center;
   width: 100%;
   padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(167, 204, 237, 0.4); 
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 1px solid rgba(130, 160, 188, 0.5);
   flex-shrink: 0;
   z-index: 50;
 }
@@ -69,9 +69,9 @@ html, body, #root {
 
 /* --- HEADER --- */
 .header-title {
-  font-size: 1.5rem; /* Slightly smaller to fit nicely in a top bar */
+  font-size: 1.5rem; 
   font-weight: 800;
-  color: #1f2937;
+  color: var(--bg-gradient-end);
   margin: 0;
   letter-spacing: -0.025em;
 }
@@ -98,12 +98,12 @@ html, body, #root {
   position: relative;
   display: flex;
   align-items: center;
-  background-color: #f3f4f6; /* gray-100 */
-  border-radius: 9999px; /* full rounded */
+  background-color: var(--bg-gradient-end);
+  border-radius: 9999px; 
   padding: 0.5rem;
   box-shadow: var(--shadow-nav);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  overflow: hidden; /* Ensures the gloss doesn't spill out */
+  border: 1px solid rgba(130, 160, 188, 0.5);
+  overflow: hidden; 
 }
 
 /* The subtle split-tone gloss effect */
@@ -111,7 +111,7 @@ html, body, #root {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   border-radius: 9999px;
-  background: linear-gradient(to bottom, rgba(229, 231, 235, 0.5), transparent);
+  background: linear-gradient(to bottom, rgba(167, 204, 237, 0.15), transparent);
   pointer-events: none;
 }
 
@@ -122,18 +122,14 @@ html, body, #root {
   border: none;
   background: transparent;
   cursor: pointer;
-  font-size: 0.875rem; /* text-sm */
+  font-size: 0.875rem; 
   font-weight: 600;
-  color: #6b7280; /* gray-500 */
+  color: var(--bg-gradient-start);
   transition: color 0.3s ease;
 }
 
-.nav-button:hover {
-  color: #4b5563; /* gray-600 */
-}
-
-.nav-button.active {
-  color: #1f2937; /* gray-800 */
+.nav-button:hover, .nav-button.active {
+  color: white;
 }
 
 .active-indicator {
@@ -174,12 +170,9 @@ html, body, #root {
 
 /* Feed Items */
 .feed-card {
-  background: white;
   border-radius: 1rem;
   padding: 1rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-  border: 1px solid #f3f4f6;
 }
 
 .card-header {
@@ -210,6 +203,11 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   color: #d1d5db;
+}
+
+.card-image-placeholder, .grid-item {
+  background-color: var(--bg-gradient-mid);
+  color: var(--bg-gradient-end);
 }
 
 /* Grid View */
@@ -243,9 +241,9 @@ html, body, #root {
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(84, 94, 117, 0.85);
   border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  border: 1px solid rgba(130, 160, 188, 0.4);
   margin-bottom: 0.75rem;
 }
 
@@ -316,7 +314,7 @@ html, body, #root {
 .welcome-text {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--bg-gradient-end);
   margin: 0;
 }
 
@@ -326,14 +324,14 @@ html, body, #root {
 }
 
 /* --- POST FORM --- */
-.create-post-card {
-  background: white;
+.create-post-card, .feed-card {
+  background: rgba(84, 94, 117, 0.95); 
   border-radius: 1.5rem;
   padding: 1.5rem;
   width: 100%;
-  max-width: 600px; /* Matches the view-wrapper width */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f3f4f6;
+  max-width: 600px; 
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(130, 160, 188, 0.4);
   margin-bottom: 1rem;
 }
 
@@ -347,16 +345,20 @@ html, body, #root {
   width: 100%;
   padding: 1rem;
   border: none;
-  background: #f9fafb;
+  background: rgba(130, 160, 188, 0.5); 
   border-radius: 1rem;
   font-size: 1rem;
-  color: #374151;
+  color: white;
   outline: none;
-  transition: ring 0.2s;
+  transition: box-shadow 0.2s;
 }
 
 .text-input:focus {
   box-shadow: 0 0 0 2px var(--primary-highlight);
+}
+
+.text-input::placeholder {
+  color: #A7CCED;
 }
 
 .form-actions {
@@ -375,17 +377,18 @@ html, body, #root {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem 1rem;
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--bg-gradient-mid);
+  color: white;
   border-radius: 9999px;
   font-size: 0.875rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
 .file-label:hover {
-  background: #e5e7eb;
+  background: var(--bg-gradient-start);
+  color: var(--bg-gradient-end);
 }
 
 /* --- BUTTONS --- */
@@ -407,9 +410,9 @@ html, body, #root {
 }
 
 .btn-secondary {
-  background: white;
-  color: #545E75;
-  border: 1px solid #82A0BC;
+  background: var(--bg-gradient-mid);
+  color: white;
+  border: 1px solid var(--bg-gradient-start);
   padding: 0.4rem 1rem;
   border-radius: 9999px;
   font-size: 0.75rem;
@@ -419,8 +422,8 @@ html, body, #root {
 }
 
 .btn-secondary:hover {
-  background: #A7CCED;
-  color: #1f2937;
+  background: var(--bg-gradient-start);
+  color: var(--bg-gradient-end);
 }
 
 .interactive-section {
