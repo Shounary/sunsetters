@@ -74,7 +74,7 @@ function App() {
     const [usersToFollow, setUsersToFollow] = useState<Array<UserDisplay>>([])
 
     const [userProfile, setUserProfile] = useState<Schema["UserProfile"]["type"]>()
-    const { user, signOut } = useAuthenticator()
+    const { user } = useAuthenticator()
 
     // FRONTEND
     const [currentTab, setCurrentTab] = useState("Feed");
@@ -330,9 +330,9 @@ function App() {
             </div>
 
             {/* 3. Scrollable Content Area */}
-            <div className="main-content-scroll-area">
+            {/* <div className="main-content-scroll-area"> */}
                 {renderContent()}
-            </div>
+            {/* </div> */}
             
         </main>
     );
