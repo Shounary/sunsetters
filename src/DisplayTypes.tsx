@@ -85,7 +85,7 @@ export const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] })
           <div key={post.id} className="feed-card">
             <div className="card-header">
               <div className="user-info">
-                <div className="avatar">
+                <div className="avatar-wrapper">
                   <AvatarImage imagePath={post.ownerImagePath}></AvatarImage>
                 </div>
                 <div>
