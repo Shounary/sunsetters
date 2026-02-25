@@ -429,10 +429,10 @@ html, body, #root {
 
 /* --- 7. DISPLAY TYPES COMPONENTS --- */
 .avatar-image-large {
-  width: 500px; 
-  height: 500px;
+  width: 100%; 
+  height: 100%;
   border-radius: 50%;
-  object-fit: cover; 
+  object-fit: fill; 
 }
 
 .btn-follow {
