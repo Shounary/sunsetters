@@ -178,9 +178,18 @@ function App() {
             setFeedDisplay([])
             if (!post?.imagePath) return
             const imageURL = await getUrl({ path: post.imagePath })
+            const postOwner = await client.models.UserProfile.get({ id: post.owner })
+
+            if (!postOwner?.data) {
+                throw Error(`Cannot find post ${post.id} owner`)
+            }
+
             const postDisplay: PostDisplay = {
                 id: post.id,
                 content: post.content ?? "",
+                ownerID: postOwner.data.id,
+                ownerName: postOwner.data.name,
+                ownerImagePath: postOwner.data.imagePath,
                 mediaURLs: [imageURL.url]
             }
             setFeedDisplay((prev) => [...prev, postDisplay])
@@ -196,9 +205,19 @@ function App() {
             setPostsDisplay([])
             if (!post?.imagePath) return
             const imageURL = await getUrl({ path: post.imagePath })
+            const postOwner = await client.models.UserProfile.get({ id: post.owner })
+
+            if (!postOwner?.data) {
+                throw Error(`Cannot find post ${post.id} owner`)
+            }
+
+            // TODO fix this inefficiency
             const postDisplay: PostDisplay = {
                 id: post.id,
                 content: post.content ?? "",
+                ownerID: postOwner.data.id,
+                ownerName: postOwner.data.name,
+                ownerImagePath: postOwner.data.imagePath,
                 mediaURLs: [imageURL.url]
             }
             setPostsDisplay((prev) => [...prev, postDisplay])
@@ -262,14 +281,11 @@ function App() {
     return (
         <main className="app-container">
             
-            {/* 1. Unified Full-Width Header */}
             <header className="main-top-header">
-                {/* Left Side: App Title */}
                 <h1 className="header-title">
                     Sun<span className="highlight">Setters</span>
                 </h1>
 
-                {/* Right Side: Profile & Actions */}
                 <div className="header-actions">
                     <button className="btn-secondary" onClick={signOut}>Sign Out</button>
                     <div className="user-info">
@@ -287,7 +303,6 @@ function App() {
                 </div>
             </header>
 
-            {/* 2. Centered Interactive Section (Form & Nav) */}
             <div className="interactive-section">
                 <div className="create-post-card">
                     <form onSubmit={handleUpload} className="create-post-form">
@@ -313,7 +328,7 @@ function App() {
                                     id="file-upload"
                                 />
                                 <label htmlFor="file-upload" className="file-label">
-                                    📷 Attach Media
+                                    +
                                 </label>
                             </div>
                             

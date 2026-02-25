@@ -85,9 +85,11 @@ export const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] })
           <div key={post.id} className="feed-card">
             <div className="card-header">
               <div className="user-info">
-                <div className="avatar" />
+                <div className="avatar">
+                  <AvatarImage imagePath={post.ownerImagePath}></AvatarImage>
+                </div>
                 <div>
-                  <h4 className="post-author-name">{post.id}</h4>
+                  <h4 className="post-author-name">{post.ownerName}</h4>
                   <p className="post-time">10m ago</p>
                 </div>
               </div>

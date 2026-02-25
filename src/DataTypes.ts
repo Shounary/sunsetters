@@ -3,6 +3,9 @@
 export type PostDisplay = {
     // user
     id: string,
+    ownerID: string,
+    ownerName: string,
+    ownerImagePath: string,
     content: string,
     mediaURLs: URL[]
 }
