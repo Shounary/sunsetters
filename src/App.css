@@ -46,10 +46,20 @@
 .app-container {
   height: 100vh; 
   width: 100%;
+  /* min-width: max-content;
+  max-width: 100%; */
   overflow: hidden; 
   display: flex;
   flex-direction: column; 
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid), var(--bg-gradient-end));
+}
+
+/* Optional: Hide the ugly scrollbar for a cleaner UI */
+.main-content-scroll-area::-webkit-scrollbar {
+  display: none;
+}
+.main-content-scroll-area {
+  scrollbar-width: none;
 }
 
 .main-top-header {

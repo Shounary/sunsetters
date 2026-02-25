@@ -334,6 +334,7 @@ function App() {
 
                 {/* Right Side: Profile & Actions */}
                 <div className="header-actions">
+                    {/* <button className="btn-secondary" onClick={signOut}>Sign Out</button> */}
                     <div className="user-info">
                         {userProfile?.imagePath ? (
                             <div className="avatar-wrapper">
@@ -342,11 +343,10 @@ function App() {
                         ) : (
                             <div className="avatar placeholder" />
                         )}
-                        <div className="user-details">
+                        {/* <div className="user-details">
                             <h2 className="welcome-text">{user?.signInDetails?.loginId}</h2>
-                        </div>
+                        </div> */}
                     </div>
-                    <button className="btn-secondary" onClick={signOut}>Sign Out</button>
                 </div>
             </header>
 
