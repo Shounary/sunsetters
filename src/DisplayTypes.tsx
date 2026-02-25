@@ -34,22 +34,26 @@ export function FollowButton({ onClick, userID }: { onClick: (targetUserID: stri
       setIsClicked(true)
   }
 
-  return <button style={{ 
+  return (
+        <button style={{ 
                 padding: '4px 12px', 
                 borderRadius: '99px', 
-                border: '1px solid #818cf8', 
-                background: isClicked ? '#e0e7ff' : 'white',
-                color: '#4f46e5',
+                /* Use Dark Blue for border */
+                border: '1px solid #545E75', 
+                /* Fill Dark Blue when followed, white when not */
+                background: isClicked ? '#545E75' : 'white',
+                /* White text when followed, Dark Blue text when not */
+                color: isClicked ? 'white' : '#545E75',
                 cursor: 'pointer',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                fontWeight: 600,
+                fontSize: '0.8rem'
             }}
-
-            onClick={
-                () => onSingleClick(userID)
-            }>
-
+            onClick={() => onSingleClick(userID)}
+        >
             {isClicked ? "Followed" : "Follow"}
-        </button>;
+        </button>
+  );
 }
 
 export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {

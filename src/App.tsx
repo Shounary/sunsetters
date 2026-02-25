@@ -247,72 +247,9 @@ function App() {
     }, [])
 
 
-    // const renderContent = () => {
-    //     switch (currentTab) {
-    //         case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
-    //         case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
-    //         case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
-    //         default: return null;
-    //     }
-    // };
 
-    // return (
-    //     <main>
-    //     <div>------</div>
-    //     <div>------</div>
-    //     <div>------</div>
-    //     <div>------</div>
-    //     <div>------</div>
-    //     <h1>Welcome {user?.signInDetails?.loginId}</h1>
-    //     <div>
-    //         {userProfile?.imagePath && (
-    //         <AvatarImage imagePath={userProfile.imagePath} />
-    //         )}
-    //     </div>
-    //     <h2>Image: {userProfile?.imagePath}</h2>
 
-    //     <form onSubmit={handleUpload}>
-    //         <div>
-    //             <label>Text:</label>
-    //             <input 
-    //                 type="text" 
-    //                 name="textInput"
-    //                 value={newPost.textInput} 
-    //                 onChange={handleNewPostChange} 
-    //             />
-    //         </div>
-
-    //         <div>
-    //             <label>Media:</label>
-    //             <input 
-    //                 type="file" 
-    //                 name="imageInput" 
-    //                 onChange={handleNewPostChange} 
-    //             />
-    //         </div>
-
-    //         <button type="submit">Post</button>
-    //     </form>
-    //     <button onClick={ signOut }>SIGN OUT</button>
-
-    //     <div className="app-container">
-    //     <div className="header-section">
-    //         <h1 className="title">
-    //         Sun<span className="highlight">Setters</span>
-    //         </h1>
-            
-    //         <NavigationBar 
-    //         tabs={["Feed", "My Posts", "Follows"]} 
-    //         activeTab={currentTab} 
-    //         onTabChange={setCurrentTab} 
-    //         />
-    //     </div>
-
-    //     {renderContent()}
-    //     </div>
-    //     </main>
-    // );
-
+    // FRONTEND
     const renderContent = () => {
         switch (currentTab) {
             case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
@@ -360,7 +297,7 @@ function App() {
                                 name="textInput"
                                 value={newPost.textInput} 
                                 onChange={handleNewPostChange} 
-                                placeholder="What's on your mind?"
+                                placeholder="Have you seen a sunset?"
                                 className="text-input"
                                 required
                             />
