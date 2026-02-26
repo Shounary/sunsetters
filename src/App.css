@@ -12,6 +12,10 @@ button:focus:not(:focus-visible) {
   box-shadow: none;
 }
 
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
 /* --- THEME VARIABLES --- */
 :root {
   /* 1. Core Hex Colors */
