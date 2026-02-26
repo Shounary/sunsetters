@@ -63,12 +63,19 @@ function App() {
         
         return unfollowedUsers
     }
-    
+
+
+
+    // REACT STATES
 
     const [newPost, setNewPost] = useState<INewPost>({
         textInput: '',
         imageInput: null
     })
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+
+
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
     const [postsDisplay, setPostsDisplay] = useState<Array<PostDisplay>>([])
     const [usersToFollow, setUsersToFollow] = useState<Array<UserDisplay>>([])
@@ -82,7 +89,7 @@ function App() {
 
 
 
-    // FILE UPLOAD
+    // CREATE A POST
     const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // files is an array-like object; we want the first one
         const { name, value, files, type } = e.target
@@ -143,10 +150,28 @@ function App() {
 
                 console.log("Calling client.mutations on frontend")
                 client.mutations.userEvent({ userEvent: UserEvent.ADD_POST_TO_FEED, originUserID: user.userId, newPostID: postData.id })
+                setNewPost({ textInput: '', imageInput: null })
             })
         })
     }
 
+    useEffect(() => {
+        if (!newPost.imageInput) {
+            setPreviewUrl(null);
+            return;
+        }
+        
+        const objectUrl = URL.createObjectURL(newPost.imageInput);
+        setPreviewUrl(objectUrl);
+
+        return () => URL.revokeObjectURL(objectUrl);
+    }, [newPost.imageInput])
+
+    const handleClearImage = () => {
+        setNewPost(prev => ({ ...prev, imageInput: null }));
+        const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+        if (fileInput) fileInput.value = '';
+    };
 
     // DELETE POST
     // const deletePost = (id: string) => {
@@ -354,20 +379,35 @@ function App() {
                             />
                         </div>
 
-                        <div className="form-actions">
-                            <div className="file-input-wrapper">
+                        <div className="form-bottom-row">
+                            <div className="media-section">
                                 <input 
                                     type="file" 
                                     name="imageInput" 
                                     onChange={handleNewPostChange} 
                                     className="file-input"
                                     id="file-upload"
+                                    accept="image/*" 
                                 />
-                                <label htmlFor="file-upload" className="file-label">
-                                    +
-                                </label>
+                                
+                                {previewUrl ? (
+                                    /* The Square Image Preview */
+                                    <div className="small-preview-wrapper">
+                                        <img src={previewUrl} alt="Upload Preview" className="small-image-preview" />
+                                        <button type="button" onClick={handleClearImage} className="small-clear-btn" aria-label="Remove image">
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    /* The Square Attach Button */
+                                    <label htmlFor="file-upload" className="square-file-label" aria-label="Attach Media">
+                                        <svg className="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </label>
+                                )}
                             </div>
-                            
                             <button type="submit" className="btn-primary">Post</button>
                         </div>
                     </form>

@@ -233,11 +233,10 @@ button {
   width: 100%;
   padding: 1rem;
   border: none;
-  /* Lightest element (Light Blue) for input field */
   background: rgba(var(--rgb-light-blue), 0.9); 
   border-radius: 1rem;
-  font-size: 1rem;
-  color: var(--color-dark-blue); /* Dark blue typing text */
+  font-size: 1rem;/* Dark blue typing text */
+  color: var(--color-dark-blue); 
   outline: none;
   transition: box-shadow 0.2s;
 }
@@ -440,7 +439,7 @@ button {
   margin-bottom: 0.75rem;
 }
 
-/* --- 7. DISPLAY TYPES COMPONENTS --- */
+/* --- DISPLAY TYPES COMPONENTS --- */
 .avatar-image {
   width: 100%; 
   height: 100%;
@@ -539,17 +538,16 @@ button {
 }
 
 .like-btn:hover {
-  color: white; /* Brightens on hover */
+  color: white;
 }
 
 .like-btn.liked {
-  color: var(--color-highlight); /* Turns Orange/Yellow when liked */
+  color: var(--color-highlight);
 }
 
 .sun-icon {
   width: 18px;
   height: 18px;
-  /* Gives the sun a bouncy "pop" effect */
   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -558,13 +556,94 @@ button {
 }
 
 .like-btn.liked .sun-icon {
-  /* Renamed animation for clarity */
   animation: sunPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-/* You can optionally rename the keyframe from heartPop to sunPop too! */
 @keyframes sunPop {
   0% { transform: scale(1) rotate(0deg); }
-  50% { transform: scale(1.4) rotate(15deg); } /* Added a little spin to the sun! */
+  50% { transform: scale(1.4) rotate(15deg); }
   100% { transform: scale(1) rotate(0deg); }
+}
+
+/* --- FORM BOTTOM ROW --- */
+.form-bottom-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.5rem; /* Small gap between text input and this row */
+}
+
+.media-section {
+  display: flex;
+  align-items: center;
+}
+
+/* --- SQUARE ATTACH BUTTON --- */
+.square-file-label {
+  width: 4.5rem; 
+  height: 4.5rem;
+  background: rgba(var(--rgb-mid-blue), 0.3);
+  color: var(--color-light-blue);
+  border: 2px dashed rgba(var(--rgb-light-blue), 0.6);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.square-file-label:hover {
+  background: var(--color-light-blue);
+  color: var(--color-dark-blue);
+  border-color: var(--color-light-blue);
+}
+
+.plus-icon {
+  width: 28px;
+  height: 28px;
+}
+
+/* --- SQUARE IMAGE PREVIEW --- */
+.small-preview-wrapper {
+  width: 4.5rem; 
+  height: 4.5rem;
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  border: 2px solid rgba(var(--rgb-light-blue), 0.6);
+}
+
+.small-image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.small-clear-btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  background: rgba(var(--rgb-dark-blue), 0.7);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s, transform 0.2s;
+  padding: 0;
+}
+
+.small-clear-btn:hover {
+  background: var(--color-highlight);
+  color: var(--color-dark-blue);
+  transform: scale(1.1);
 }
