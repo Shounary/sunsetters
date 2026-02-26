@@ -1,0 +1,119 @@
+/* --- MAIN AUTH CONTAINER / CARD --- */
+/* Makes the main wrapper transparent */
+[data-amplify-authenticator] {
+  background-color: transparent !important;
+}
+
+/* The actual card container */
+[data-amplify-router] {
+  background-color: rgba(130, 160, 188, 0.95) !important; /* Mid Blue Glass */
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(167, 204, 237, 0.5) !important;
+  padding: 2rem !important;
+  max-width: 450px !important;
+  margin: 2rem auto !important;
+}
+
+/* --- TABS (Sign In / Sign Up) --- */
+.amplify-tabs,
+.amplify-tabs__list {
+  border: none !important;
+  border-top: none !important; 
+  border-bottom: none !important; 
+  box-shadow: none !important;
+}
+
+.amplify-tabs__list {
+  gap: 0.5rem !important;
+  margin-bottom: 1.5rem !important;
+  justify-content: center !important; /* Optional: centers the tabs nicely */
+}
+
+.amplify-tabs__item {
+  color: #545E75 !important; /* Dark Blue */
+  font-weight: 700 !important;
+  border: none !important; /* Kills the active tab border */
+  border-radius: 9999px !important;
+  transition: all 0.3s ease !important;
+  background-color: transparent !important;
+  margin-top: 0 !important; /* Prevents jumping if Amplify adds negative margins */
+}
+
+.amplify-tabs__item[aria-selected="true"],
+.amplify-tabs__item--active {
+  color: #ffffff !important;
+  background-color: rgba(84, 94, 117, 0.8) !important; /* Dark Blue Pill */
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12) !important;
+}
+
+.amplify-tabs__item:hover:not([aria-selected="true"]) {
+  color: #ffffff !important;
+  background-color: rgba(167, 204, 237, 0.2) !important;
+}
+
+/* --- INPUT FIELDS & PASSWORD WRAPPER --- */
+.amplify-field-group__field-wrapper {
+  background-color: rgba(167, 204, 237, 0.9) !important; /* Light blue typing area */
+  border-radius: 1rem !important;
+  border: 2px solid transparent !important;
+  transition: border-color 0.2s !important;
+}
+
+.amplify-field-group__field-wrapper:focus-within {
+  border-color: #F7AF4B !important; /* Highlight Orange focus ring */
+}
+
+/* The actual input fields inside the wrapper */
+.amplify-input {
+  background-color: transparent !important;
+  border: none !important;
+  color: #545E75 !important; /* Dark blue typing text */
+  padding: 1rem !important;
+  font-size: 1rem !important;
+  box-shadow: none !important; /* Remove default amplify focus shadow */
+}
+
+.amplify-input::placeholder {
+  color: rgba(84, 94, 117, 0.6) !important;
+}
+
+/* Password Eye Icon Button */
+.amplify-field-group__control.amplify-button {
+  background-color: transparent !important;
+  border: none !important;
+  color: #545E75 !important;
+}
+
+/* --- BUTTONS --- */
+/* Primary Submit Button */
+.amplify-button--primary {
+  background: linear-gradient(135deg, #F7AF4B, #e59d38) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.8rem 1.5rem !important;
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(247, 175, 75, 0.3) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  margin-top: 1rem !important;
+}
+
+.amplify-button--primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 15px rgba(247, 175, 75, 0.4) !important;
+}
+
+/* Text Links (Forgot Password) */
+.amplify-button--link {
+  color: #F7AF4B !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  background: transparent !important;
+}
+
+.amplify-button--link:hover {
+  color: #e59d38 !important;
+  text-decoration: underline !important;
+  background: transparent !important;
+}

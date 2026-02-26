@@ -1,7 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "./auth.css"
 import App from "./App.tsx";
-import "./index.css";
+// import "./index.css";
 import { Amplify } from "aws-amplify";
 import { Authenticator } from "@aws-amplify/ui-react";
 import outputs from "../amplify_outputs.json";
@@ -36,8 +37,10 @@ const formFields = {
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <Authenticator formFields={formFields}>
-      <App />
-    </Authenticator>
+    <div className="app-container">
+      <Authenticator formFields={formFields}>
+        <App/>
+      </Authenticator>
+    </div>
   </React.StrictMode>
 );
