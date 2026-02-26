@@ -5,6 +5,10 @@ html, body, #root {
   width: 100vw;
   overflow: hidden;
   box-sizing: border-box;
+
+  background-color: #3d4556;
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
 }
 
 button:focus:not(:focus-visible) {
