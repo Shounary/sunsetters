@@ -41,29 +41,36 @@ export function FollowButton({ onClick, userID }: { onClick: (targetUserID: stri
   );
 }
 
-export function LikeButton({ initialLikes = 0, onLike }: { initialLikes?: number, onLike?: (liked: boolean) => void }) {
-  const [isLiked, setIsLiked] = useState(false);
-  const [likes, setLikes] = useState(initialLikes);
+export function LikeButton({ post, onLike }:
+    { post: PostDisplay, onLike?: (liked: boolean, postID: string) => void }) {
+  const [ wasLiked, setWasLiked ] = useState(post.wasLiked);
+  const [likes, setLikes] = useState(post.likes);
 
   const handleToggleLike = () => {
-    const newState = !isLiked;
-    setIsLiked(newState);
+    const newState = !post.wasLiked
+
+    // changing local display vars
+    setWasLiked(newState);
     setLikes(newState ? likes + 1 : likes - 1);
+
+    // changing post display vars
+    post.wasLiked = newState
+    post.likes = newState ? post.likes + 1: post.likes - 1
     
     if (onLike) {
-      onLike(newState);
+      onLike(newState, post.id);
     }
   };
 
   return (
     <button 
-      className={`like-btn ${isLiked ? 'liked' : ''}`} 
+      className={`like-btn ${wasLiked ? 'liked' : ''}`}
       onClick={handleToggleLike}
     >
       <svg 
         className="sun-icon" 
         viewBox="0 0 24 24" 
-        fill={isLiked ? "currentColor" : "none"} 
+        fill={wasLiked ? "currentColor" : "none"} 
         stroke="currentColor" 
         strokeWidth="2.5" 
         strokeLinecap="round" 
@@ -87,7 +94,7 @@ export function LikeButton({ initialLikes = 0, onLike }: { initialLikes?: number
   );
 }
 
-export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
+export const FeedView = ( { feedDisplay, onLike } : {feedDisplay: PostDisplay[], onLike: (liked: boolean, postID: string) => void }) => {
   return (
     <div className="feed-mask view-wrapper">
       <div className="feed-scroll-view">
@@ -111,7 +118,7 @@ export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
             />
             
             <div className="post-actions">
-               <LikeButton initialLikes={Math.floor(Math.random() * 50) + 10} />
+               <LikeButton post={post} onLike={onLike} />
                <span className="post-action-btn">💬 {20}</span>
                <span className="post-action-btn">↗️ Share</span>
             </div>
@@ -123,7 +130,7 @@ export const FeedView = ( { feedDisplay } : {feedDisplay: PostDisplay[]}) => {
   );
 };
 
-export const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] }) => {
+export const MyPostsView = ( { postsDisplay, onLike } : { postsDisplay: PostDisplay[], onLike: (liked: boolean, postID: string) => void  }) => {
   return (
     <div className="feed-mask view-wrapper">
       <div className="feed-scroll-view">
@@ -154,7 +161,7 @@ export const MyPostsView = ( { postsDisplay } : { postsDisplay: PostDisplay[] })
             
             {/* Added a custom style to override margin-top if needed, or you can just let .post-actions handle it */}
             <div className="post-actions" style={{ marginTop: 0 }}>
-               <LikeButton initialLikes={Math.floor(Math.random() * 50) + 10} />
+               <LikeButton post={post} onLike={onLike} />
                <span className="post-action-btn">💬 {20}</span>
                <span className="post-action-btn">↗️ Share</span>
             </div>

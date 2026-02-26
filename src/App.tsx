@@ -171,6 +171,31 @@ function App() {
         })
     }
 
+    // LIKE/UNLIKE
+    const onLike = async (newLikeState: boolean, postID: string) => {
+        const post = await client.models.Post.get({ id: postID })
+        console.log("getting post to like/dislike")
+        if (!post?.data) {
+            throw Error(`Failed to find post ${postID} to like!`)
+        }
+        let likes = post.data.likes
+        if (newLikeState) {
+            if (!likes.includes(user.userId)) {
+                console.log("Liking a post")
+                likes.push(user.userId)
+            }
+        } else {
+            console.log("Disliking a post")
+            likes = await likes.filter(p => p != user.userId)
+        }
+        console.log(`New likes: ${likes}`)
+
+        await client.models.Post.update({ 
+            id: postID,
+            likes: likes
+        })
+    }
+
 
     // FEED DISPLAY
     const extractFeed = async () => {
@@ -187,11 +212,16 @@ function App() {
 
             const postDisplay: PostDisplay = {
                 id: post.id,
-                content: post.content ?? "",
+
                 ownerID: postOwner.data.id,
                 ownerName: postOwner.data.name,
                 ownerImagePath: postOwner.data.imagePath,
-                mediaURLs: [imageURL.url]
+
+                content: post.content ?? "",
+                mediaURLs: [imageURL.url],
+
+                likes: post.likes.length,
+                wasLiked: post.likes.includes(user.userId)
             }
             setFeedDisplay((prev) => [...prev, postDisplay])
         });
@@ -215,11 +245,16 @@ function App() {
             // TODO fix this inefficiency
             const postDisplay: PostDisplay = {
                 id: post.id,
-                content: post.content ?? "",
+
                 ownerID: postOwner.data.id,
                 ownerName: postOwner.data.name,
                 ownerImagePath: postOwner.data.imagePath,
-                mediaURLs: [imageURL.url]
+
+                content: post.content ?? "",
+                mediaURLs: [imageURL.url],
+
+                likes: post.likes.length,
+                wasLiked: post.likes.includes(user.userId)
             }
             setPostsDisplay((prev) => [...prev, postDisplay])
         });
@@ -272,8 +307,8 @@ function App() {
     // FRONTEND
     const renderContent = () => {
         switch (currentTab) {
-            case "Feed": return <FeedView feedDisplay={feedDisplay}/>;
-            case "My Posts": return <MyPostsView postsDisplay={postsDisplay}/>;
+            case "Feed": return <FeedView feedDisplay={feedDisplay} onLike={onLike}/>;
+            case "My Posts": return <MyPostsView postsDisplay={postsDisplay} onLike={onLike}/>;
             case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
             default: return null;
         }
