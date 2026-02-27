@@ -23,7 +23,7 @@ const formFields = {
       order: 2,
       placeholder: 'Enter Your Email Here',
       isRequired: true,
-      label: 'Email:'
+      label: 'Email'
     },
 
     password: {
