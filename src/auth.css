@@ -1,12 +1,12 @@
 /* --- MAIN AUTH CONTAINER / CARD --- */
-[data-amplify-authenticator] [data-amplify-router] {
+[data-amplify-authenticator] [data-amplify-container] {
   background-color: rgba(130, 160, 188, 0.95) !important; 
   border-radius: 1.5rem !important;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
   border: 1px solid rgba(167, 204, 237, 0.5) !important;
   
-  /* UPDATED: Top/Sides get 1.5rem, Bottom gets a tighter 1rem */
-  padding: 2rem 1.5rem 0.25rem !important; 
+  /* Slightly larger top padding to frame the logo beautifully */
+  padding: 1.5rem 1.5rem 1rem !important; 
   
   max-width: 450px !important;
   margin: 2rem auto !important;
@@ -16,10 +16,19 @@
   -ms-overflow-style: none !important; 
 }
 
+[data-amplify-authenticator] [data-amplify-router] {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 /* Hides scrollbar for Chrome/Safari/Webkit */
 [data-amplify-authenticator] [data-amplify-router]::-webkit-scrollbar {
   display: none !important;
 }
+
 
 /* The actual card container */
 [data-amplify-router] {
@@ -223,4 +232,22 @@
 /* --- FORM FIELD SPACING --- */
 [data-amplify-authenticator] form .amplify-flex[style*="flex-direction: column"] {
   gap: 0.75rem !important; /* Overrides Amplify's default larger gaps */
+}
+
+/* --- AUTH LOGO HEADER --- */
+.auth-logo-header {
+  font-size: 2.75rem !important; /* Scaled down slightly to fit the card */
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important; 
+  margin: 0 0 1.5rem 0 !important; /* Creates perfect space before the tabs */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  text-align: center !important;
+}
+
+.logo-sun {
+  color: #ffffff !important; 
+}
+
+.logo-setters {
+  color: #F7AF4B !important; 
 }

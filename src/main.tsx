@@ -4,7 +4,7 @@ import "./auth.css"
 import App from "./App.tsx";
 // import "./index.css";
 import { Amplify } from "aws-amplify";
-import { Authenticator } from "@aws-amplify/ui-react";
+import { Authenticator, View } from "@aws-amplify/ui-react";
 import outputs from "../amplify_outputs.json";
 import '@aws-amplify/ui-react/styles.css';
 
@@ -35,10 +35,23 @@ const formFields = {
   }
 }
 
+const components = {
+  Header() {
+    return (
+      <div className="auth-header-container">
+        <h1 className="auth-logo-header">
+          <span className="logo-sun">Sun</span>
+          <span className="logo-setters">Setters</span>
+        </h1>
+      </div>
+    );
+  },
+};
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <div className="app-container">
-      <Authenticator formFields={formFields}>
+      <Authenticator formFields={formFields} components={components}>
         <App/>
       </Authenticator>
     </div>
