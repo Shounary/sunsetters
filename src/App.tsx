@@ -172,6 +172,40 @@ function App() {
         if (fileInput) fileInput.value = '';
     };
 
+
+    // CHANGE PROFILE IMAGE
+    const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !userProfile) return;
+
+        try {
+            // 1. Upload the new image to S3
+            // Using a distinct folder path like 'profile-pictures/' keeps your storage organized
+            const uploadResult = await uploadData({
+                path: `profile-pictures/${userProfile.id}-${Date.now()}-${file.name}`,
+                data: file,
+                options: {
+                    contentType: file.type // Dynamically set based on the file
+                }
+            }).result;
+
+            console.log(`Profile image uploaded to ${uploadResult.path}`);
+
+            remove({ path: userProfile.imagePath })
+
+            console.log(`Removed old profile image ${userProfile.imagePath}`);
+
+            // 2. Update the UserProfile record in the database
+            await client.models.UserProfile.update({
+                id: userProfile.id,
+                imagePath: uploadResult.path
+            });
+        } catch (error) {
+            console.error("Failed to update profile image:", error);
+        }
+    };
+
+
     // DELETE POST
     const deletePost = async (postID: string) => {
         try {
@@ -261,6 +295,7 @@ function App() {
         });
     }
 
+
     // POSTS DISPLAY
     const extractPosts = async () => {
         const postFeed = await fetchUserPosts()
@@ -293,6 +328,7 @@ function App() {
             setPostsDisplay((prev) => [...prev, postDisplay])
         });
     }
+
 
     // USERS TO FOLLOW DISPLAY
     const extractUsersToFollow = async (currentUser: Schema["UserProfile"]["type"]) => {
@@ -359,16 +395,34 @@ function App() {
                 <div className="header-actions">
                     <button className="btn-secondary" onClick={signOut}>Sign Out</button>
                     <div className="user-info">
-                        {userProfile?.imagePath ? (
-                            <div className="avatar-wrapper">
-                                <AvatarImage imagePath={userProfile.imagePath} />
+                        
+                        {/* Wrap the avatar in a label tied to the hidden input */}
+                        <label htmlFor="profile-upload" className="avatar-upload-label" title="Change Profile Picture">
+                            {userProfile?.imagePath ? (
+                                <div className="avatar-wrapper">
+                                    <AvatarImage imagePath={userProfile.imagePath} />
+                                </div>
+                            ) : (
+                                <div className="avatar placeholder avatar-wrapper" />
+                            )}
+                            
+                            {/* Hover overlay with a camera icon */}
+                            <div className="avatar-hover-overlay">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
                             </div>
-                        ) : (
-                            <div className="avatar placeholder" />
-                        )}
-                        {/* <div className="user-details">
-                            <h2 className="welcome-text">{user?.signInDetails?.loginId}</h2>
-                        </div> */}
+                        </label>
+
+                        {/* The hidden file input */}
+                        <input 
+                            type="file" 
+                            id="profile-upload" 
+                            style={{ display: 'none' }} 
+                            accept="image/*"
+                            onChange={handleProfileImageChange}
+                        />
                     </div>
                 </div>
             </header>
