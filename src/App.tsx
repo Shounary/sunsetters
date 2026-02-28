@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
 import type { Schema } from "../amplify/data/resource";
 import { generateClient } from "aws-amplify/data";
-import { getUrl, uploadData } from "aws-amplify/storage";
-// import { remove } from "aws-amplify/storage";
+import { getUrl, uploadData, remove } from "aws-amplify/storage";
 import { useAuthenticator } from "@aws-amplify/ui-react";
 import { PostDisplay, INewPost, UserDisplay } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
@@ -174,18 +173,28 @@ function App() {
     };
 
     // DELETE POST
-    // const deletePost = (id: string) => {
-    //     client.models.UserPost.delete({ id: id })
-    //     client.models.Post.get({ id: id }).then((post) => {
-    //         if (!post || !post.data?.imagePath) {
-    //            console.warn(`Could not find post with id ${id} to delete!`)
-    //            return
-    //         }
-    //         client.models.Post.delete({ id: id })
-    //         setFeedDisplay((prev) => prev.filter((f) => f.id !== id))
-    //         remove({ path: post.data?.imagePath })
-    //     })
-    // }
+    const deletePost = async (postID: string) => {
+        try {
+            const post = await client.models.Post.get({ id: postID })
+
+            if (!post?.data) {
+                console.warn(`Could not find post ${postID} to delete!`)
+                return
+            }
+
+            if (post.data.imagePath) {
+                remove({ path: post.data.imagePath })
+            }
+
+            await client.models.UserPost.delete({ id: postID })
+
+            await client.models.Post.delete({ id: postID })
+
+            setPostsDisplay((prev) => prev.filter((p) => p.id !== postID))
+        } catch(error) {
+            console.error(`Error deleting post: ${error}`)
+        }
+    }
 
     // FOLLOW USER
     const followUser = async (targetUserID: string) => {
@@ -333,7 +342,7 @@ function App() {
     const renderContent = () => {
         switch (currentTab) {
             case "Feed": return <FeedView feedDisplay={feedDisplay} onLike={onLike}/>;
-            case "My Posts": return <MyPostsView postsDisplay={postsDisplay} onLike={onLike}/>;
+            case "My Posts": return <MyPostsView postsDisplay={postsDisplay} onLike={onLike} onDelete={deletePost}/>;
             case "Follows": return <FollowsView users={usersToFollow} followUser={followUser}/>;
             default: return null;
         }

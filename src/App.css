@@ -647,3 +647,78 @@ button {
   color: var(--color-dark-blue);
   transform: scale(1.1);
 }
+
+/* --- POST OPTIONS MENU --- */
+.post-options-container {
+  position: relative;
+  display: inline-block;
+}
+
+.post-options-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-dark-blue);
+  font-size: 1.2rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 0.5rem;
+  transition: color 0.2s;
+}
+
+.post-options-btn:hover {
+  color: white;
+}
+
+.post-options-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.25rem;
+  background: rgba(var(--rgb-dark-blue), 0.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(var(--rgb-light-blue), 0.3);
+  border-radius: 0.75rem;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  min-width: 140px;
+  padding: 0.5rem 0;
+  z-index: 100;
+  animation: fadeInDown 0.2s ease-out;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  background: rgba(var(--rgb-light-blue), 0.15);
+}
+
+.dropdown-item.text-danger {
+  color: #ff6b6b; /* Red text for destructive actions */
+}
+
+.dropdown-item.text-danger:hover {
+  background: rgba(255, 107, 107, 0.1); /* Subtle red tint on hover */
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
