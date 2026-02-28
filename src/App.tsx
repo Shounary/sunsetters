@@ -7,6 +7,7 @@ import { PostDisplay, INewPost, UserDisplay } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
 import { UserEvent } from "../amplify/functions/common/types";
 import { FeedView, MyPostsView, FollowsView } from "./DisplayTypes";
+import { isValidImage } from "./utils.ts"
 import NavigationBar from "./NavigationBar";
 
 function App() {
@@ -92,11 +93,23 @@ function App() {
     const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         // files is an array-like object; we want the first one
         const { name, value, files, type } = e.target
-        setNewPost((prev) => ({
-            ...prev,
-            [name]: type === 'file' ? (files ? files[0] : null) : value
-        }))
-        console.log(newPost.textInput)
+        if (type == 'file') {
+            const isValid = isValidImage(files ? files[0] : null)
+            if (isValid.valid) {
+                setNewPost((prev) => ({
+                    ...prev,
+                    [name]: type === 'file' ? (files ? files[0] : null) : value
+                }))
+            } else {
+                alert(isValid.error);
+            }
+        } else {
+            setNewPost((prev) => ({
+                ...prev,
+                [name]: type === 'file' ? (files ? files[0] : null) : value
+            }))
+            console.log(newPost.textInput)
+        }
     };
 
     const handleUpload = (e: React.FormEvent) => {
@@ -177,6 +190,12 @@ function App() {
     const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !userProfile) return;
+
+        const isValid = isValidImage(file)
+        if (!isValid.valid) {
+            alert(isValid.error)
+            return
+        }
 
         try {
             // 1. Upload the new image to S3
@@ -408,7 +427,8 @@ function App() {
                             
                             {/* Hover overlay with a camera icon */}
                             <div className="avatar-hover-overlay">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" 
+                                    fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                                     <circle cx="12" cy="13" r="4"></circle>
                                 </svg>
@@ -420,7 +440,7 @@ function App() {
                             type="file" 
                             id="profile-upload" 
                             style={{ display: 'none' }} 
-                            accept="image/*"
+                            accept="image/jpeg, image/png, image/webp, image/gif"
                             onChange={handleProfileImageChange}
                         />
                     </div>
@@ -450,7 +470,7 @@ function App() {
                                     onChange={handleNewPostChange} 
                                     className="file-input"
                                     id="file-upload"
-                                    accept="image/*" 
+                                    accept="image/jpeg, image/png, image/webp, image/gif"
                                 />
                                 
                                 {previewUrl ? (
