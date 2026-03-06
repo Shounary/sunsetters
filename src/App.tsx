@@ -89,8 +89,6 @@ function App() {
         textInput: '',
         imageInput: null
     })
-    // const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
 
 
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
@@ -115,42 +113,13 @@ function App() {
         }));
     };
 
-    // const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     // files is an array-like object; we want the first one
-    //     const { name, value, files, type } = e.target
-    //     if (type == 'file') {
-    //         const isValid = isValidImage(files ? files[0] : null)
-    //         if (isValid.valid) {
-    //             setNewPost((prev) => ({
-    //                 ...prev,
-    //                 [name]: type === 'file' ? (files ? files[0] : null) : value
-    //             }))
-    //         } else {
-    //             alert(isValid.error);
-    //         }
-    //     } else {
-    //         setNewPost((prev) => ({
-    //             ...prev,
-    //             [name]: type === 'file' ? (files ? files[0] : null) : value
-    //         }))
-    //         console.log(newPost.textInput)
-    //     }
-    // };
-
     const handleUpload = (e: React.FormEvent) => {
         e.preventDefault()
         if (!postImageFile && newPost.textInput === '') return;
 
-        
-        // e.preventDefault()
-        // if (!newPost || (!newPost.imageInput && newPost.textInput == '')) return;
-        // // console.log("Uploading:", new.name);
-        // // Logic to send file to server goes here
-
         // CREATE A POST
         // Create a dud post
         client.models.Post.create({
-            // timestamp: new Date().getUTCDate().toString()
             owner: user.userId,
             content: newPost.textInput,
             likes: []
@@ -200,18 +169,6 @@ function App() {
         })
     }
 
-    // useEffect(() => {
-    //     if (!newPost.imageInput) {
-    //         setPreviewUrl(null);
-    //         return;
-    //     }
-        
-    //     const objectUrl = URL.createObjectURL(newPost.imageInput);
-    //     setPreviewUrl(objectUrl);
-
-    //     return () => URL.revokeObjectURL(objectUrl);
-    // }, [newPost.imageInput])
-
     // CHANGE PROFILE IMAGE
     // Listen for when the hook successfully finishes processing a new profile image
     useEffect(() => {
@@ -219,7 +176,6 @@ function App() {
             if (!profileImageFile || !userProfile) return;
 
             try {
-                // 1. Upload the optimized image to S3
                 const uploadResult = await uploadData({
                     path: `profile-pictures/${userProfile.id}-${Date.now()}-${profileImageFile.name}`,
                     data: profileImageFile,
@@ -230,19 +186,17 @@ function App() {
 
                 console.log(`Profile image uploaded to ${uploadResult.path}`);
 
-                // Clean up the old one
-                if (userProfile.imagePath) {
-                    remove({ path: userProfile.imagePath }).catch(console.error);
-                    console.log(`Removed old profile image ${userProfile.imagePath}`);
-                }
-
-                // 2. Update the UserProfile record in the database
+                
                 await client.models.UserProfile.update({
                     id: userProfile.id,
                     imagePath: uploadResult.path
                 });
 
-                // 3. Clear the file state out of the hook so it doesn't re-trigger
+                if (userProfile.imagePath) {
+                    remove({ path: userProfile.imagePath }).catch(console.error);
+                    console.log(`Removed old profile image ${userProfile.imagePath}`);
+                }
+
                 clearProfileImage();
                 
             } catch (error) {
@@ -252,51 +206,6 @@ function App() {
 
         uploadProfilePicture();
     }, [profileImageFile, userProfile, clearProfileImage]);
-
-    // const handleClearImage = () => {
-    //     setNewPost(prev => ({ ...prev, imageInput: null }));
-    //     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-    //     if (fileInput) fileInput.value = '';
-    // };
-
-
-    // // CHANGE PROFILE IMAGE
-    // const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const file = e.target.files?.[0];
-    //     if (!file || !userProfile) return;
-
-    //     const isValid = isValidImage(file)
-    //     if (!isValid.valid) {
-    //         alert(isValid.error)
-    //         return
-    //     }
-
-    //     try {
-    //         // 1. Upload the new image to S3
-    //         // Using a distinct folder path like 'profile-pictures/' keeps your storage organized
-    //         const uploadResult = await uploadData({
-    //             path: `profile-pictures/${userProfile.id}-${Date.now()}-${file.name}`,
-    //             data: file,
-    //             options: {
-    //                 contentType: file.type // Dynamically set based on the file
-    //             }
-    //         }).result;
-
-    //         console.log(`Profile image uploaded to ${uploadResult.path}`);
-
-    //         remove({ path: userProfile.imagePath })
-
-    //         console.log(`Removed old profile image ${userProfile.imagePath}`);
-
-    //         // 2. Update the UserProfile record in the database
-    //         await client.models.UserProfile.update({
-    //             id: userProfile.id,
-    //             imagePath: uploadResult.path
-    //         });
-    //     } catch (error) {
-    //         console.error("Failed to update profile image:", error);
-    //     }
-    // };
 
 
     // DELETE POST
