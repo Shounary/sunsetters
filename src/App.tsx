@@ -483,8 +483,40 @@ function App() {
                                 />
 
                                 {isPostImageProcessing ? (
-                                    <div className="small-preview-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                        <small>Optimizing...</small>
+                                    <div 
+                                        className="small-preview-wrapper" 
+                                        style={{ 
+                                            display: 'flex', 
+                                            flexDirection: 'column', 
+                                            alignItems: 'center', 
+                                            justifyContent: 'center', 
+                                            gap: '8px',
+                                            color: '#666' // Matches standard secondary text
+                                        }}
+                                    >
+                                        {/* Animated SVG Spinner */}
+                                        <svg 
+                                            width="28" 
+                                            height="28" 
+                                            viewBox="0 0 24 24" 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            stroke="currentColor" 
+                                            fill="none"
+                                        >
+                                            {/* Faded background track */}
+                                            <circle cx="12" cy="12" r="10" strokeWidth="3" stroke="rgba(0,0,0,0.1)" />
+                                            {/* Spinning active segment */}
+                                            <path d="M12 2 a10 10 0 0 1 10 10" strokeWidth="3" strokeLinecap="round">
+                                                <animateTransform 
+                                                    attributeName="transform" 
+                                                    type="rotate" 
+                                                    from="0 12 12" 
+                                                    to="360 12 12" 
+                                                    dur="0.8s" 
+                                                    repeatCount="indefinite" 
+                                                />
+                                            </path>
+                                        </svg>
                                     </div>
                                 ) : postPreviewUrl ? (
                                     <div className="small-preview-wrapper">
@@ -501,22 +533,6 @@ function App() {
                                         </svg>
                                     </label>
                                 )}
-                                
-                                {/* {previewUrl ? (
-                                    <div className="small-preview-wrapper">
-                                        <img src={previewUrl} alt="Upload Preview" className="small-image-preview" />
-                                        <button type="button" onClick={handleClearImage} className="small-clear-btn" aria-label="Remove image">
-                                            ✕
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <label htmlFor="file-upload" className="square-file-label" aria-label="Attach Media">
-                                        <svg className="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                                        </svg>
-                                    </label>
-                                )} */}
                             </div>
                             <button type="submit" className="btn-primary" disabled={isPostImageProcessing}>Post</button>
                         </div>
