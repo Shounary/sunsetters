@@ -7,7 +7,7 @@ import { PostDisplay, INewPost, UserDisplay } from "./DataTypes";
 import { AvatarImage } from "./DisplayTypes";
 import { UserEvent } from "../amplify/functions/common/types";
 import { FeedView, MyPostsView, FollowsView } from "./DisplayTypes";
-import { isValidImage } from "./utils.ts"
+import { useImageUpload } from './hooks/useImageUpload';
 import NavigationBar from "./NavigationBar";
 
 function App() {
@@ -64,15 +64,32 @@ function App() {
         return unfollowedUsers
     }
 
+    // Hook for New Posts
+    const { 
+        file: postImageFile, 
+        previewUrl: postPreviewUrl, 
+        isProcessing: isPostImageProcessing, 
+        error: postImageError, 
+        handleImageChange: handlePostImageSelect, 
+        clearImage: clearPostImage 
+    } = useImageUpload({ maxWidth: 1080, maxHeight: 1080, quality: 0.85 });
+
+    // Hook for Profile Pictures
+    const { 
+        file: profileImageFile, 
+        isProcessing: isProfileProcessing, 
+        handleImageChange: handleProfileImageSelect, 
+        clearImage: clearProfileImage 
+    } = useImageUpload({ maxWidth: 400, maxHeight: 400, quality: 0.8 });
+
 
 
     // REACT STATES
-
     const [newPost, setNewPost] = useState<INewPost>({
         textInput: '',
         imageInput: null
     })
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    // const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
 
 
@@ -90,33 +107,45 @@ function App() {
 
 
     // CREATE A POST
-    const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        // files is an array-like object; we want the first one
-        const { name, value, files, type } = e.target
-        if (type == 'file') {
-            const isValid = isValidImage(files ? files[0] : null)
-            if (isValid.valid) {
-                setNewPost((prev) => ({
-                    ...prev,
-                    [name]: type === 'file' ? (files ? files[0] : null) : value
-                }))
-            } else {
-                alert(isValid.error);
-            }
-        } else {
-            setNewPost((prev) => ({
-                ...prev,
-                [name]: type === 'file' ? (files ? files[0] : null) : value
-            }))
-            console.log(newPost.textInput)
-        }
+    const handleNewPostTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setNewPost((prev) => ({
+            ...prev,
+            [name]: value
+        }));
     };
+
+    // const handleNewPostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     // files is an array-like object; we want the first one
+    //     const { name, value, files, type } = e.target
+    //     if (type == 'file') {
+    //         const isValid = isValidImage(files ? files[0] : null)
+    //         if (isValid.valid) {
+    //             setNewPost((prev) => ({
+    //                 ...prev,
+    //                 [name]: type === 'file' ? (files ? files[0] : null) : value
+    //             }))
+    //         } else {
+    //             alert(isValid.error);
+    //         }
+    //     } else {
+    //         setNewPost((prev) => ({
+    //             ...prev,
+    //             [name]: type === 'file' ? (files ? files[0] : null) : value
+    //         }))
+    //         console.log(newPost.textInput)
+    //     }
+    // };
 
     const handleUpload = (e: React.FormEvent) => {
         e.preventDefault()
-        if (!newPost || (!newPost.imageInput && newPost.textInput == '')) return;
-        // console.log("Uploading:", new.name);
-        // Logic to send file to server goes here
+        if (!postImageFile && newPost.textInput === '') return;
+
+        
+        // e.preventDefault()
+        // if (!newPost || (!newPost.imageInput && newPost.textInput == '')) return;
+        // // console.log("Uploading:", new.name);
+        // // Logic to send file to server goes here
 
         // CREATE A POST
         // Create a dud post
@@ -132,17 +161,17 @@ function App() {
             }
             // console.log(`File ${file.name} selected`)
             const postData = post.data
-            if (!newPost.imageInput) {
+            if (!postImageFile) {
                 console.log("The post included no media!")
                 return
             }
 
             // Upload image to S3 storage
             uploadData({
-                path: `images/${post.data.id}-${newPost.imageInput.name}`,
-                data: newPost.imageInput,
+                path: `images/${post.data.id}-${postImageFile.name}`,
+                data: postImageFile,
                 options: {
-                    contentType: "image/png"
+                    contentType: postImageFile.type
                 }
             }).result.then((uploaded) => {
                 console.log(`Image ${uploaded.path} uploaded to storage`)
@@ -153,7 +182,7 @@ function App() {
                     content: postData.content,
                     imagePath: uploaded.path
                 }).then(() => {
-                    console.log(`Post for ${newPost.imageInput?.name} update with newly uploaded image ${uploaded.path}`)
+                    console.log(`Post for ${postImageFile.name} update with newly uploaded image ${uploaded.path}`)
                 })
 
                 client.models.UserPost.create({ postID: postData.id }).catch(() => {
@@ -162,67 +191,112 @@ function App() {
 
                 console.log("Calling client.mutations on frontend")
                 client.mutations.userEvent({ userEvent: UserEvent.ADD_POST_TO_FEED, originUserID: user.userId, newPostID: postData.id })
+
+
+                // Clear the text and reset the image hook
                 setNewPost({ textInput: '', imageInput: null })
+                clearPostImage();
             })
         })
     }
 
-    useEffect(() => {
-        if (!newPost.imageInput) {
-            setPreviewUrl(null);
-            return;
-        }
+    // useEffect(() => {
+    //     if (!newPost.imageInput) {
+    //         setPreviewUrl(null);
+    //         return;
+    //     }
         
-        const objectUrl = URL.createObjectURL(newPost.imageInput);
-        setPreviewUrl(objectUrl);
+    //     const objectUrl = URL.createObjectURL(newPost.imageInput);
+    //     setPreviewUrl(objectUrl);
 
-        return () => URL.revokeObjectURL(objectUrl);
-    }, [newPost.imageInput])
-
-    const handleClearImage = () => {
-        setNewPost(prev => ({ ...prev, imageInput: null }));
-        const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
-    };
-
+    //     return () => URL.revokeObjectURL(objectUrl);
+    // }, [newPost.imageInput])
 
     // CHANGE PROFILE IMAGE
-    const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file || !userProfile) return;
+    // Listen for when the hook successfully finishes processing a new profile image
+    useEffect(() => {
+        const uploadProfilePicture = async () => {
+            if (!profileImageFile || !userProfile) return;
 
-        const isValid = isValidImage(file)
-        if (!isValid.valid) {
-            alert(isValid.error)
-            return
-        }
+            try {
+                // 1. Upload the optimized image to S3
+                const uploadResult = await uploadData({
+                    path: `profile-pictures/${userProfile.id}-${Date.now()}-${profileImageFile.name}`,
+                    data: profileImageFile,
+                    options: {
+                        contentType: profileImageFile.type 
+                    }
+                }).result;
 
-        try {
-            // 1. Upload the new image to S3
-            // Using a distinct folder path like 'profile-pictures/' keeps your storage organized
-            const uploadResult = await uploadData({
-                path: `profile-pictures/${userProfile.id}-${Date.now()}-${file.name}`,
-                data: file,
-                options: {
-                    contentType: file.type // Dynamically set based on the file
+                console.log(`Profile image uploaded to ${uploadResult.path}`);
+
+                // Clean up the old one
+                if (userProfile.imagePath) {
+                    remove({ path: userProfile.imagePath }).catch(console.error);
+                    console.log(`Removed old profile image ${userProfile.imagePath}`);
                 }
-            }).result;
 
-            console.log(`Profile image uploaded to ${uploadResult.path}`);
+                // 2. Update the UserProfile record in the database
+                await client.models.UserProfile.update({
+                    id: userProfile.id,
+                    imagePath: uploadResult.path
+                });
 
-            remove({ path: userProfile.imagePath })
+                // 3. Clear the file state out of the hook so it doesn't re-trigger
+                clearProfileImage();
+                
+            } catch (error) {
+                console.error("Failed to update profile image:", error);
+            }
+        };
 
-            console.log(`Removed old profile image ${userProfile.imagePath}`);
+        uploadProfilePicture();
+    }, [profileImageFile, userProfile, clearProfileImage]);
 
-            // 2. Update the UserProfile record in the database
-            await client.models.UserProfile.update({
-                id: userProfile.id,
-                imagePath: uploadResult.path
-            });
-        } catch (error) {
-            console.error("Failed to update profile image:", error);
-        }
-    };
+    // const handleClearImage = () => {
+    //     setNewPost(prev => ({ ...prev, imageInput: null }));
+    //     const fileInput = document.getElementById('file-upload') as HTMLInputElement;
+    //     if (fileInput) fileInput.value = '';
+    // };
+
+
+    // // CHANGE PROFILE IMAGE
+    // const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = e.target.files?.[0];
+    //     if (!file || !userProfile) return;
+
+    //     const isValid = isValidImage(file)
+    //     if (!isValid.valid) {
+    //         alert(isValid.error)
+    //         return
+    //     }
+
+    //     try {
+    //         // 1. Upload the new image to S3
+    //         // Using a distinct folder path like 'profile-pictures/' keeps your storage organized
+    //         const uploadResult = await uploadData({
+    //             path: `profile-pictures/${userProfile.id}-${Date.now()}-${file.name}`,
+    //             data: file,
+    //             options: {
+    //                 contentType: file.type // Dynamically set based on the file
+    //             }
+    //         }).result;
+
+    //         console.log(`Profile image uploaded to ${uploadResult.path}`);
+
+    //         remove({ path: userProfile.imagePath })
+
+    //         console.log(`Removed old profile image ${userProfile.imagePath}`);
+
+    //         // 2. Update the UserProfile record in the database
+    //         await client.models.UserProfile.update({
+    //             id: userProfile.id,
+    //             imagePath: uploadResult.path
+    //         });
+    //     } catch (error) {
+    //         console.error("Failed to update profile image:", error);
+    //     }
+    // };
 
 
     // DELETE POST
@@ -441,7 +515,8 @@ function App() {
                             id="profile-upload" 
                             style={{ display: 'none' }} 
                             accept="image/jpeg, image/png, image/webp, image/gif"
-                            onChange={handleProfileImageChange}
+                            onChange={handleProfileImageSelect}
+                            disabled={isProfileProcessing}
                         />
                     </div>
                 </div>
@@ -455,34 +530,40 @@ function App() {
                                 type="text" 
                                 name="textInput"
                                 value={newPost.textInput} 
-                                onChange={handleNewPostChange} 
+                                onChange={handleNewPostTextChange} 
                                 placeholder="Have you seen a sunset?"
                                 className="text-input"
                                 required
                             />
                         </div>
 
+                        {/* Surface hook validation errors to the user */}
+                        {postImageError && <p style={{ color: 'red', fontSize: '0.9em', margin: '5px 0' }}>{postImageError}</p>}
+
                         <div className="form-bottom-row">
                             <div className="media-section">
                                 <input 
                                     type="file" 
                                     name="imageInput" 
-                                    onChange={handleNewPostChange} 
+                                    onChange={handlePostImageSelect} 
                                     className="file-input"
                                     id="file-upload"
                                     accept="image/jpeg, image/png, image/webp, image/gif"
+                                    disabled={isPostImageProcessing}
                                 />
-                                
-                                {previewUrl ? (
-                                    /* The Square Image Preview */
+
+                                {isPostImageProcessing ? (
+                                    <div className="small-preview-wrapper" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                        <small>Optimizing...</small>
+                                    </div>
+                                ) : postPreviewUrl ? (
                                     <div className="small-preview-wrapper">
-                                        <img src={previewUrl} alt="Upload Preview" className="small-image-preview" />
-                                        <button type="button" onClick={handleClearImage} className="small-clear-btn" aria-label="Remove image">
+                                        <img src={postPreviewUrl} alt="Upload Preview" className="small-image-preview" />
+                                        <button type="button" onClick={clearPostImage} className="small-clear-btn" aria-label="Remove image">
                                             ✕
                                         </button>
                                     </div>
                                 ) : (
-                                    /* The Square Attach Button */
                                     <label htmlFor="file-upload" className="square-file-label" aria-label="Attach Media">
                                         <svg className="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -490,8 +571,24 @@ function App() {
                                         </svg>
                                     </label>
                                 )}
+                                
+                                {/* {previewUrl ? (
+                                    <div className="small-preview-wrapper">
+                                        <img src={previewUrl} alt="Upload Preview" className="small-image-preview" />
+                                        <button type="button" onClick={handleClearImage} className="small-clear-btn" aria-label="Remove image">
+                                            ✕
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <label htmlFor="file-upload" className="square-file-label" aria-label="Attach Media">
+                                        <svg className="plus-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                                        </svg>
+                                    </label>
+                                )} */}
                             </div>
-                            <button type="submit" className="btn-primary">Post</button>
+                            <button type="submit" className="btn-primary" disabled={isPostImageProcessing}>Post</button>
                         </div>
                     </form>
                 </div>
