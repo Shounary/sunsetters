@@ -99,7 +99,7 @@ function App() {
     const { user, signOut } = useAuthenticator()
 
     // FRONTEND
-    const [currentTab, setCurrentTab] = useState("My Posts");
+    const [currentTab, setCurrentTab] = useState("Feed");
 
 
 
