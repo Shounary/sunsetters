@@ -46,7 +46,19 @@ function App() {
             .map(r => r.data)
             .filter(item => item !== null)
 
-        const sortedFeed = feed.sort( (a, b) => 
+        const sumFeed = feed
+
+        if (feed.length < 5) {
+            const { data: rawSecondaryFeed } = await client.models.Post.list({
+                limit: 15
+            })
+            const secondaryFeed = rawSecondaryFeed
+                .filter(item => item !== null && item.owner !== user.userId)
+
+            sumFeed.concat(secondaryFeed)
+        }
+
+        const sortedFeed = sumFeed.sort( (a, b) => 
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
 
