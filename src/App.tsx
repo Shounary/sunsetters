@@ -99,7 +99,7 @@ function App() {
     const { user, signOut } = useAuthenticator()
 
     // FRONTEND
-    const [currentTab, setCurrentTab] = useState("Feed");
+    const [currentTab, setCurrentTab] = useState("My Posts");
 
 
 
@@ -123,7 +123,7 @@ function App() {
             owner: user.userId,
             content: newPost.textInput,
             likes: []
-        }).then((post) => {
+        }).then(async (post) => {
             if (!post.data) {
                 console.warn("Post contains empty data!");
                 return
@@ -136,7 +136,7 @@ function App() {
             }
 
             // Upload image to S3 storage
-            uploadData({
+            await uploadData({
                 path: `images/${post.data.id}-${postImageFile.name}`,
                 data: postImageFile,
                 options: {
@@ -187,15 +187,15 @@ function App() {
                 console.log(`Profile image uploaded to ${uploadResult.path}`);
 
                 
-                await client.models.UserProfile.update({
-                    id: userProfile.id,
-                    imagePath: uploadResult.path
-                });
-
                 if (userProfile.imagePath) {
                     remove({ path: userProfile.imagePath }).catch(console.error);
                     console.log(`Removed old profile image ${userProfile.imagePath}`);
                 }
+
+                await client.models.UserProfile.update({
+                    id: userProfile.id,
+                    imagePath: uploadResult.path
+                });
 
                 clearProfileImage();
                 
@@ -266,91 +266,112 @@ function App() {
         })
     }
 
-
     // FEED DISPLAY
     const extractFeed = async () => {
-        const postFeed = await fetchUserFeed()
-        postFeed.forEach(async post => {
-            setFeedDisplay([])
-            if (!post?.imagePath) return
-            const imageURL = await getUrl({ path: post.imagePath })
-            const postOwner = await client.models.UserProfile.get({ id: post.owner })
+        const postFeed = await fetchUserFeed();
+        
+        const feedPromises = postFeed.map(async (post) => {
+            if (!post?.imagePath) return null;
+            
+            const imageURL = await getUrl({ path: post.imagePath });
+            const postOwner = await client.models.UserProfile.get({ id: post.owner });
 
             if (!postOwner?.data) {
-                throw Error(`Cannot find post ${post.id} owner`)
+                console.warn(`Cannot find post ${post.id} owner`);
+                return null;
             }
 
             const postDisplay: PostDisplay = {
                 id: post.id,
-
                 ownerID: postOwner.data.id,
                 ownerName: postOwner.data.name,
                 ownerImagePath: postOwner.data.imagePath,
-
                 content: post.content ?? "",
                 mediaURLs: [imageURL.url],
-
                 likes: post.likes.length,
                 wasLiked: post.likes.includes(user.userId)
-            }
-            setFeedDisplay((prev) => [...prev, postDisplay])
+            };
+            
+            return postDisplay;
         });
-    }
 
+        const resolvedFeed = await Promise.all(feedPromises);
+
+        const finalFeed = resolvedFeed.filter(p => p !== null) as PostDisplay[];
+
+        setFeedDisplay(finalFeed);
+    }
 
     // POSTS DISPLAY
     const extractPosts = async () => {
-        const postFeed = await fetchUserPosts()
-        console.log(`fetching posts of length: ${postFeed.length}`)
-        postFeed.forEach(async post => {
-            console.log(post)
-            setPostsDisplay([])
-            if (!post?.imagePath) return
-            const imageURL = await getUrl({ path: post.imagePath })
-            const postOwner = await client.models.UserProfile.get({ id: post.owner })
+        const posts = await fetchUserPosts()
+        
+        const postPromises = posts.map(async (post) => {
+            if (!post?.imagePath) return null;
+            
+            const imageURL = await getUrl({ path: post.imagePath });
+            const postOwner = await client.models.UserProfile.get({ id: post.owner });
 
             if (!postOwner?.data) {
-                throw Error(`Cannot find post ${post.id} owner`)
+                console.warn(`Cannot find post ${post.id} owner`);
+                return null;
             }
 
-            // TODO fix this inefficiency
             const postDisplay: PostDisplay = {
                 id: post.id,
-
                 ownerID: postOwner.data.id,
                 ownerName: postOwner.data.name,
                 ownerImagePath: postOwner.data.imagePath,
-
                 content: post.content ?? "",
                 mediaURLs: [imageURL.url],
-
                 likes: post.likes.length,
                 wasLiked: post.likes.includes(user.userId)
-            }
-            setPostsDisplay((prev) => [...prev, postDisplay])
+            };
+            
+            return postDisplay;
         });
+
+        const resolvedPosts = await Promise.all(postPromises);
+
+        const finalPosts = resolvedPosts.filter(p => p !== null) as PostDisplay[];
+
+        setPostsDisplay(finalPosts);
     }
 
 
     // USERS TO FOLLOW DISPLAY
     const extractUsersToFollow = async (currentUser: Schema["UserProfile"]["type"]) => {
-        const usersToFollow = await fetchUsersToFollow(currentUser)
-        usersToFollow.forEach(async u => {
-            setUsersToFollow([])
-            if (!u) return
-            const pfpURL = await getUrl({ path: u.imagePath })
-            const userDisplay: UserDisplay = {
-                id: u.id,
-                name: u.name,
-                profilePicture: pfpURL.url
+        const unfollowedUsers = await fetchUsersToFollow(currentUser);
+        
+        const userPromises = unfollowedUsers.map(async (u) => {
+            if (!u) return null;
+            
+            try {
+                const pfpURL = await getUrl({ path: u.imagePath });
+                
+                const userDisplay: UserDisplay = {
+                    id: u.id,
+                    name: u.name,
+                    profilePicture: pfpURL.url
+                };
+                
+                return userDisplay;
+            } catch (error) {
+                console.warn(`Failed to load profile picture for user ${u.id}`, error);
+                return null;
             }
-            setUsersToFollow((prev) => [...prev, userDisplay])
         });
+
+        const resolvedUsers = await Promise.all(userPromises);
+        
+        const finalUsers = resolvedUsers.filter(u => u !== null) as UserDisplay[];
+        
+        setUsersToFollow(finalUsers);
     }
 
     useEffect(() => {
         const postSub = client.models.UserPost.observeQuery().subscribe({
-            next: () => extractPosts(),
+            next: async () => await extractPosts(),
         })
         
         const userSub = client.models.UserProfile.observeQuery({
