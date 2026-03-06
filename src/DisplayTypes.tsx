@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { getUrl } from "aws-amplify/storage";
 import { PostDisplay, UserDisplay } from "./DataTypes";
+import { formatTimeAgo } from "./utils/dateTimeFormat";
 
 export function AvatarImage({ imagePath }: { imagePath: string }) {
   const [src, setSrc] = useState<string>("");
@@ -179,7 +180,7 @@ export const FeedView = ( { feedDisplay, onLike } : {feedDisplay: PostDisplay[],
                 <div className="avatar" />
                 <div>
                   <h4 className="post-author-name">{post.id}</h4>
-                  <p className="post-time">10m ago</p>
+                  <p className="post-time">{formatTimeAgo(post.createdAt)}</p>
                 </div>
               </div>
               <span className="post-options-icon">•••</span>
@@ -193,7 +194,7 @@ export const FeedView = ( { feedDisplay, onLike } : {feedDisplay: PostDisplay[],
             
             <div className="post-actions">
                <LikeButton post={post} onLike={onLike} />
-               <span className="post-action-btn">💬 {20}</span>
+               <span className="post-action-btn">💬 {0}</span>
                <span className="post-action-btn">↗️ Share</span>
             </div>
           </div>
@@ -220,7 +221,7 @@ export const MyPostsView = (
                 </div>
                 <div>
                   <h4 className="post-author-name">{post.ownerName}</h4>
-                  <p className="post-time">10m ago</p>
+                  <p className="post-time">{formatTimeAgo(post.createdAt)}</p>
                 </div>
               </div>
               <PostOptionsMenu postID={post.id} onDelete={onDelete} />
@@ -239,7 +240,7 @@ export const MyPostsView = (
             {/* Added a custom style to override margin-top if needed, or you can just let .post-actions handle it */}
             <div className="post-actions" style={{ marginTop: 0 }}>
                <LikeButton post={post} onLike={onLike} />
-               <span className="post-action-btn">💬 {20}</span>
+               <span className="post-action-btn">💬 {0}</span>
                <span className="post-action-btn">↗️ Share</span>
             </div>
           </div>
