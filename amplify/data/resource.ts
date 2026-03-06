@@ -15,11 +15,13 @@ const schema = a.schema({
   Post: a
   .model({
     id: a.id().required(),
-    // timestamp: a.datetime().required(),
+    owner: a.string().required(),
     content: a.string(),
     imagePath: a.string(),
+    likes: a.string().required().array().required()
   })
-  .authorization((allow) => [allow.owner()]),
+  .authorization((allow) => [allow.authenticated()]),
+  
 
   UserProfile: a
   .model({
@@ -32,12 +34,19 @@ const schema = a.schema({
   })
   .authorization((allow) => [allow.authenticated()]),
 
-  UserFeed: a.
+  FeedPost: a.
   model({
     postID: a.string().required(),
-    ownerID: a.string().required(),
+    owner: a.string().required(),
+    wasViewed: a.boolean().default(false)
   })
-  .authorization((allow) => allow.owner()),
+  .authorization((allow) => [allow.owner()]),
+
+  UserPost: a.
+  model({
+    postID: a.string().required()
+  })
+  .authorization((allow) => [allow.owner()]),
 
   userEvent: a.mutation()
   .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
@@ -45,12 +54,17 @@ const schema = a.schema({
   .returns(a.boolean()),
 
 })
+
 .authorization(allow => [
   allow.authenticated(),
   allow.resource(postConfirmation),
   allow.resource(userEvents),
   allow.resource(fanoutWorker),
 ]);
+
+
+
+
 
 export type Schema = ClientSchema<typeof schema>;
 

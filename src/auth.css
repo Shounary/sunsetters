@@ -1,0 +1,253 @@
+/* --- MAIN AUTH CONTAINER / CARD --- */
+[data-amplify-authenticator] [data-amplify-container] {
+  background-color: rgba(130, 160, 188, 0.95) !important; 
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(167, 204, 237, 0.5) !important;
+  
+  /* Slightly larger top padding to frame the logo beautifully */
+  padding: 1.5rem 1.5rem 1rem !important; 
+  
+  max-width: 450px !important;
+  margin: 2rem auto !important;
+  max-height: 90vh !important; 
+  overflow-y: auto !important; 
+  scrollbar-width: none !important; 
+  -ms-overflow-style: none !important; 
+}
+
+[data-amplify-authenticator] [data-amplify-router] {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Hides scrollbar for Chrome/Safari/Webkit */
+[data-amplify-authenticator] [data-amplify-router]::-webkit-scrollbar {
+  display: none !important;
+}
+
+
+/* The actual card container */
+[data-amplify-router] {
+  background-color: rgba(130, 160, 188, 0.95) !important; /* Mid Blue Glass */
+  border-radius: 1.5rem !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2) !important;
+  border: 1px solid rgba(167, 204, 237, 0.5) !important;
+  padding: 2rem !important;
+  max-width: 450px !important;
+  margin: 2rem auto !important;
+}
+
+[data-amplify-authenticator] .amplify-heading {
+  font-size: 2rem !important; /* Noticeably larger */
+  font-weight: 800 !important; /* Extra bold */
+  margin-bottom: 2rem !important; /* Pushes the form down slightly */
+  letter-spacing: -0.025em !important;
+  
+  /* Apply the orange gradient directly to the text */
+  background: linear-gradient(135deg, #f7cb8d, #efd2aa) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important; /* Fallback */
+}
+
+/* --- TABS (Sign In / Sign Up) --- */
+.amplify-tabs,
+.amplify-tabs__list {
+  border: none !important;
+  border-top: none !important; 
+  border-bottom: none !important; 
+  box-shadow: none !important;
+}
+
+.amplify-tabs__list {
+  gap: 0.25rem !important;
+  margin-bottom: 0.25rem !important; /* REDUCED from 2rem */
+  justify-content: center !important;
+  background-color: rgba(84, 94, 117, 0.4) !important; 
+  border-radius: 9999px !important;
+  padding: 0.35rem !important;
+}
+
+.amplify-tabs__item {
+  color: rgba(255, 255, 255, 0.7) !important; /* Crisp semi-transparent white for inactive */
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 9999px !important;
+  transition: all 0.3s ease !important;
+  background-color: transparent !important;
+  margin-top: 0 !important;
+  padding: 0.75rem 1.5rem !important;
+}
+
+.amplify-tabs__item[aria-selected="true"],
+.amplify-tabs__item--active {
+  color: #ffffff !important;
+  background-color: #545E75 !important; /* Deep dark blue active pill */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
+}
+
+.amplify-tabs__item:hover:not([aria-selected="true"]) {
+  color: #ffffff !important;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* --- REMOVE HIDDEN TAB PANEL SPACING --- */
+[data-amplify-authenticator] .amplify-tabs {
+  margin-bottom: 0 !important; 
+}
+
+[data-amplify-authenticator] .amplify-tabs__panel {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* --- INPUT FIELDS & PASSWORD WRAPPER --- */
+.amplify-field-group__field-wrapper {
+  background-color: rgba(167, 204, 237, 0.9) !important; /* Light blue typing area */
+  border-radius: 1rem !important;
+  border: 2px solid transparent !important;
+  transition: border-color 0.2s !important;
+}
+
+.amplify-field-group__field-wrapper:focus-within {
+  border-color: #F7AF4B !important; /* Highlight Orange focus ring */
+}
+
+/* The actual input fields inside the wrapper */
+.amplify-input {
+  background-color: transparent !important;
+  border: none !important;
+  color: #545E75 !important; /* Dark blue typing text */
+  padding: 1rem !important;
+  font-size: 1rem !important;
+  box-shadow: none !important; /* Remove default amplify focus shadow */
+}
+
+.amplify-input::placeholder {
+  color: rgba(84, 94, 117, 0.6) !important;
+}
+
+/* Password Eye Icon Button */
+.amplify-field-group__control.amplify-button {
+  background-color: transparent !important;
+  border: none !important;
+  color: #545E75 !important;
+}
+
+/* --- BUTTONS --- */
+/* Primary Submit Button */
+.amplify-button--primary {
+  background: linear-gradient(135deg, #F7AF4B, #e59d38) !important;
+  color: white !important;
+  border: none !important;
+  padding: 0.8rem 1.5rem !important;
+  border-radius: 9999px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 10px rgba(247, 175, 75, 0.3) !important;
+  transition: transform 0.2s, box-shadow 0.2s !important;
+  margin-top: 1rem !important;
+}
+
+.amplify-button--primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 15px rgba(247, 175, 75, 0.4) !important;
+}
+
+/* Text Links (Forgot Password) */
+.amplify-button--link {
+  color: #F7AF4B !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  background: transparent !important;
+}
+
+.amplify-button--link:hover {
+  color: #e59d38 !important;
+  text-decoration: underline !important;
+  background: transparent !important;
+}
+
+/* --- LABELS --- */
+/* Increased specificity to override Amplify defaults */
+[data-amplify-authenticator] .amplify-label {
+  color: #ffffff !important; /* Forces pure white */
+  font-weight: 600 !important;
+  margin-bottom: 0.5rem !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.02em !important;
+}
+
+/* --- LINKS (Forgot Password) --- */
+/* Increased specificity here as well */
+[data-amplify-authenticator] .amplify-button.amplify-button--link {
+  color: #ffffff !important; /* White stands out better against the mid-blue */
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  background: transparent !important;
+  opacity: 0.8 !important;
+  transition: all 0.2s ease !important;
+}
+
+[data-amplify-authenticator] .amplify-button.amplify-button--link:hover {
+  color: #F7AF4B !important; /* Lights up orange on hover */
+  opacity: 1 !important;
+  text-decoration: none !important;
+}
+
+/* --- FIELD VALIDATION ERRORS --- */
+/* Targets the specific password requirements and error text */
+[data-amplify-authenticator] .amplify-text--error,
+[data-amplify-authenticator] .amplify-field-group__error {
+  color: #ff8fa3 !important; /* A soft, bright coral/pink that pops on blue */
+  font-size: 0.75rem !important; /* Smaller text to save vertical space */
+  line-height: 1.2 !important; /* Tightens the gap between multiple errors */
+  margin-top: 0.3rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
+}
+
+/* --- TOP LEVEL ALERT BANNERS (e.g., "User already exists") --- */
+[data-amplify-authenticator] .amplify-alert--error {
+  background-color: rgba(255, 143, 163, 0.1) !important;
+  border: 1px solid rgba(255, 143, 163, 0.4) !important;
+  border-radius: 1rem !important;
+  margin-bottom: 1rem !important;
+}
+
+[data-amplify-authenticator] .amplify-alert__heading,
+[data-amplify-authenticator] .amplify-alert__body {
+  color: #ffffff !important;
+  font-size: 0.85rem !important;
+}
+
+[data-amplify-authenticator] .amplify-alert__icon {
+  fill: #ff8fa3 !important;
+}
+
+/* --- FORM FIELD SPACING --- */
+[data-amplify-authenticator] form .amplify-flex[style*="flex-direction: column"] {
+  gap: 0.75rem !important; /* Overrides Amplify's default larger gaps */
+}
+
+/* --- AUTH LOGO HEADER --- */
+.auth-logo-header {
+  font-size: 2.75rem !important; /* Scaled down slightly to fit the card */
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important; 
+  margin: 0 0 1.5rem 0 !important; /* Creates perfect space before the tabs */
+  font-family: 'Inter', system-ui, -apple-system, sans-serif !important;
+  text-align: center !important;
+}
+
+.logo-sun {
+  color: #ffffff !important; 
+}
+
+.logo-setters {
+  color: #F7AF4B !important; 
+}

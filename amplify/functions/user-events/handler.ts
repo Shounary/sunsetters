@@ -42,6 +42,15 @@ export const handler: AppSyncResolverHandler<SchemaMutationArgs, boolean> = asyn
 // Individual Handlers
 
 async function followHandler(originUserID: string, targetUserID: string) {
+  const origUser = await (await client.models.UserProfile.get({ id: originUserID })).data
+  if (!origUser) {
+    throw Error(`Cannot fect user ${originUserID}`)
+  }
+
+  client.models.UserProfile.update({
+    id: originUserID,
+    follows: [...origUser.follows ?? [], targetUserID],
+  })
   await publishToSNS({ userEvent: UserEvent.FOLLOW_USER, originUserID: originUserID, targetUserID: targetUserID });
   return true;
 }

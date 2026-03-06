@@ -52,17 +52,16 @@ async function followUser(payload: UserEventPayload) {
   }
 
   const updatedFollowers = targetUser.followers
-  updatedFollowers.push(payload.originUserID)
-
+  console.log(`User ${payload.targetUserID} has these followers: ${targetUser.followers}`);
+  updatedFollowers?.push(payload.originUserID)
   console.log(`Adding a new follower to ${payload.targetUserID}`);
+  console.log(`New followers array: ${updatedFollowers}`);
 
-  client.models.UserProfile.update({
+  await client.models.UserProfile.update({
       id: targetUser.id,
-      owner: targetUser.owner,
-      imagePath: targetUser.imagePath,
-      name: targetUser.name,
-      followers: updatedFollowers,
-      follows: targetUser.follows
+      followers: updatedFollowers
+  }).catch((error) => {
+    throw error
   })
 }
 
@@ -83,12 +82,12 @@ async function addPostToFeed(payload: UserEventPayload) {
 
   console.log(`User ${originUserProfile.id} has these followers: ${originUserProfile.followers}`)
 
-  console.log(`Fanout: Updating ${originUserProfile.followers.length} follower feeds...`);
+  console.log(`Fanout: Updating ${originUserProfile.followers?.length} follower feeds...`);
   
   await Promise.all(
-      (originUserProfile?.followers ?? []).map( follower => client.models.UserFeed.create({
+      (originUserProfile?.followers ?? []).map( follower => client.models.FeedPost.create({
           postID: payload.newPostID,
-          ownerID: payload.originUserID
+          owner: follower,
       }))
     )
 }
