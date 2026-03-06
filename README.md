@@ -1,25 +1,18 @@
-## AWS Amplify React+Vite Starter Template
+## Sunsetters
 
-This repository provides a starter template for creating applications using React+Vite and AWS Amplify, emphasizing easy setup for authentication, API, and database capabilities.
+Social media that focuses on capturing the sunsets on planet Earth (no sunrises!).
+Deployed master branch: https://main.d3byukh2m7etfz.amplifyapp.com
 
 ## Overview
 
-This template equips you with a foundational React application integrated with AWS Amplify, streamlined for scalability and performance. It is ideal for developers looking to jumpstart their project with pre-configured AWS services like Cognito, AppSync, and DynamoDB.
+
+On a technical level this is a news feed system where users can follow each other and create posts upload images featuring sunsets. Most of the functionality implemented are based on AWS.
 
 ## Features
+- **Stack**: Node.js + React TS + Vite
 
-- **Authentication**: Setup with Amazon Cognito for secure user authentication.
-- **API**: Ready-to-use GraphQL endpoint with AWS AppSync.
+- **Authentication**: Amazon Cognito for secure user authentication.
+- **API**: GraphQL endpoint with AWS AppSync.
 - **Database**: Real-time database powered by Amazon DynamoDB.
-
-## Deploying to AWS
-
-For detailed instructions on deploying your application, refer to the [deployment section](https://docs.amplify.aws/react/start/quickstart/#deploy-a-fullstack-app-to-aws) of our documentation.
-
-## Security
-
-See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
-
-## License
-
-This library is licensed under the MIT-0 License. See the LICENSE file.
+- **Storage**: Amazon S3 utilized for media storage.
+- **Fanout**: Utilizes Amazon SNS and SQS (+Lambda functions) for fanout messaging.
