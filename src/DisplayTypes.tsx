@@ -177,13 +177,14 @@ export const FeedView = ( { feedDisplay, onLike } : {feedDisplay: PostDisplay[],
           <div key={post.id} className="feed-card">
             <div className="card-header">
               <div className="user-info">
-                <div className="avatar" />
+                <div className="avatar-wrapper">
+                  <AvatarImage imagePath={post.ownerImagePath}></AvatarImage>
+                </div>
                 <div>
-                  <h4 className="post-author-name">{post.id}</h4>
+                  <h4 className="post-author-name">{post.ownerName}</h4>
                   <p className="post-time">{formatTimeAgo(post.createdAt)}</p>
                 </div>
               </div>
-              <span className="post-options-icon">•••</span>
             </div>
             
             <img 
@@ -191,8 +192,12 @@ export const FeedView = ( { feedDisplay, onLike } : {feedDisplay: PostDisplay[],
                 alt={post.mediaURLs[0].toString()} 
                 className="post-media-img"
             />
+
+            <div className="post-text-content">
+              {post.content}
+            </div>
             
-            <div className="post-actions">
+            <div className="post-actions" style={{ marginTop: 0 }}>
                <LikeButton post={post} onLike={onLike} />
                <span className="post-action-btn">💬 {0}</span>
                <span className="post-action-btn">↗️ Share</span>
@@ -237,7 +242,6 @@ export const MyPostsView = (
               {post.content}
             </div>
             
-            {/* Added a custom style to override margin-top if needed, or you can just let .post-actions handle it */}
             <div className="post-actions" style={{ marginTop: 0 }}>
                <LikeButton post={post} onLike={onLike} />
                <span className="post-action-btn">💬 {0}</span>
