@@ -199,7 +199,7 @@ function App() {
                 console.log(`Profile image uploaded to ${uploadResult.path}`);
 
                 
-                if (userProfile.imagePath) {
+                if (userProfile.imagePath && !userProfile.imagePath.startsWith("default-profile-pictures/")) {
                     remove({ path: userProfile.imagePath }).catch(console.error);
                     console.log(`Removed old profile image ${userProfile.imagePath}`);
                 }
