@@ -35,35 +35,41 @@ function App() {
     // TODO: add wasViewedCheck
 
     async function fetchUserFeed() {
-        const { data: userFeed } = await client.models.FeedPost.list()
-        const fetch = userFeed.map(post => 
-            client.models.Post.get({ id: post.postID })
-        )
+    const { data: userFeed } = await client.models.FeedPost.list();
+    const fetch = userFeed.map(post => 
+        client.models.Post.get({ id: post.postID })
+    );
 
-        const rawFeed = await Promise.all(fetch)
+    const rawFeed = await Promise.all(fetch);
 
-        const feed = rawFeed
-            .map(r => r.data)
-            .filter(item => item !== null)
+    const primaryFeed = rawFeed
+        .map(r => r.data)
+        .filter(item => item !== null);
 
-        const sumFeed = feed
+    let sumFeed = [...primaryFeed];
 
-        if (feed.length < 5) {
-            const { data: rawSecondaryFeed } = await client.models.Post.list({
-                limit: 15
-            })
-            const secondaryFeed = rawSecondaryFeed
-                .filter(item => item !== null && item.owner !== user.userId)
+    if (primaryFeed.length < 5) {
+        const { data: rawSecondaryFeed } = await client.models.Post.list({
+            limit: 15
+        });
+        
+        const primaryPostIds = new Set(primaryFeed.map(post => post.id));
+        
+        const secondaryFeed = rawSecondaryFeed.filter(item => 
+            item !== null && 
+            item.owner !== user.userId &&
+            !primaryPostIds.has(item.id)
+        );
 
-            sumFeed.concat(secondaryFeed)
-        }
-
-        const sortedFeed = sumFeed.sort( (a, b) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        )
-
-        return sortedFeed
+        sumFeed = [...sumFeed, ...secondaryFeed];
     }
+
+    const sortedFeed = sumFeed.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+
+    return sortedFeed;
+}
 
     async function fetchUsersToFollow(currentUser: Schema["UserProfile"]["type"]) {
         const { data: users } =  await client.models.UserProfile.list({
