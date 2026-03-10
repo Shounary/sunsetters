@@ -3,6 +3,9 @@ import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { postConfirmation } from './auth/post-confirmation/resource';
+import { DatadogLambda } from 'datadog-cdk-constructs-v2';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 
 import { userEvents } from './functions/user-events/resource';
 import { fanoutWorker } from './functions/fanout-worker/resource';
@@ -32,3 +35,28 @@ userEventsTopic.grantPublish(backend.userEvents.resources.lambda);
 userEventsTopic.addSubscription(
   new subs.LambdaSubscription(backend.fanoutWorker.resources.lambda)
 );
+
+
+// Backend monitoring
+const monitoringStack = backend.createStack('DatadogMonitoringStack');
+
+const datadogSecret = Secret.fromSecretNameV2(
+  monitoringStack, 
+  'DDSecretLookup', 
+  'DatadogApiKey'
+);
+
+const datadog = new DatadogLambda(monitoringStack, 'DatadogIntegration', {
+  nodeLayerVersion: 114, 
+  extensionLayerVersion: 61,
+  site: 'us3.datadoghq.com',
+  apiKeySecretArn: datadogSecret.secretArn, 
+  env: 'prod',
+  service: 'sunsetters-backend',
+})
+
+datadog.addLambdaFunctions([
+  backend.postConfirmation.resources.lambda as lambda.Function,
+  backend.userEvents.resources.lambda as lambda.Function,
+  backend.fanoutWorker.resources.lambda as lambda.Function
+]);
