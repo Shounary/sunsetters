@@ -131,15 +131,36 @@ function App() {
         }));
     };
 
-    const handleUpload = (e: React.FormEvent) => {
+    const handleUpload = async (e: React.FormEvent) => {
         e.preventDefault()
-        if (!postImageFile && newPost.textInput === '') return;
+        if (!postImageFile) return;
 
-        // CREATE A POST
-        // Create a dud post
-        client.models.Post.create({
+        const uploadResult = await uploadData({
+            path: `images/${user.userId}-${Date.now()}-${postImageFile.name}`,
+            data: postImageFile,
+            options: { contentType: postImageFile.type }
+        }).result;
+
+        console.log("Image uploaded. Processing AI sunset image analysis...");
+
+        const { data: isSunset, errors } = await client.queries.sunsetAnalyzer({
+            imagePath: uploadResult.path
+        });
+
+        if (errors || !isSunset) {
+            console.log("Not a sunset! Deleting file...");
+            await remove({ path: uploadResult.path });
+            alert("Beautiful photo, but our AI couldn't detect a sunset! Please try another one.");
+            clearPostImage()
+            return;
+        }
+
+        console.log("Sunset verified in image! Creating post...");
+        
+        await client.models.Post.create({
             owner: user.userId,
             content: newPost.textInput,
+            imagePath: uploadResult.path,
             likes: []
         }).then(async (post) => {
             if (!post.data) {
