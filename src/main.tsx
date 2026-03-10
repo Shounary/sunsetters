@@ -9,6 +9,9 @@ import '@aws-amplify/ui-react/styles.css';
 import { datadogRum } from '@datadog/browser-rum';
 import { reactPlugin } from '@datadog/browser-rum-react';
 
+Amplify.configure(outputs);
+
+const backendApiUrl = outputs.data?.url;
 
 // RUM Monitoring Setup
 datadogRum.init({
@@ -24,13 +27,15 @@ datadogRum.init({
     trackUserInteractions: true,
     trackLongTasks: true,
     plugins: [reactPlugin({ router: false })],
+    allowedTracingUrls: backendApiUrl ? [
+        { 
+            match: backendApiUrl, 
+            propagatorTypes: ["datadog", "tracecontext"] 
+        }
+    ] : [],
 });
 
 datadogRum.startSessionReplayRecording();
-
-
-
-Amplify.configure(outputs);
 
 const formFields = {
   signUp: {
