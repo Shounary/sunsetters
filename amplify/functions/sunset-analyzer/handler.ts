@@ -18,8 +18,8 @@ export const handler: Schema["sunsetAnalyzer"]["functionHandler"] = async (event
         Name: imagePath,
       },
     },
-    MaxLabels: 10,       
-    MinConfidence: 75,
+    MaxLabels: 20,       
+    MinConfidence: 70,
   });
 
   try {

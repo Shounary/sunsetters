@@ -24,6 +24,7 @@ const backend = defineBackend({
   sunsetAnalyzer
 });
 
+// Fanout SNS setup
 const fanoutStack = backend.createStack('UserFanoutStack');
 
 const userEventsTopic = new sns.Topic(fanoutStack, 'UserEventsTopic');
@@ -39,16 +40,16 @@ userEventsTopic.addSubscription(
   new subs.LambdaSubscription(backend.fanoutWorker.resources.lambda)
 );
 
-// 1. Give the function the name of your S3 bucket
+
+
+// sunsetAnalyzer permissions
 backend.sunsetAnalyzer.addEnvironment(
   'BUCKET_NAME',
   backend.storage.resources.bucket.bucketName
 );
 
-// 2. Grant the function permission to read files from that bucket
 backend.storage.resources.bucket.grantRead(backend.sunsetAnalyzer.resources.lambda);
 
-// 3. Grant the function permission to call AWS Rekognition
 backend.sunsetAnalyzer.resources.lambda.addToRolePolicy(
   new iam.PolicyStatement({
     actions: ['rekognition:DetectLabels'],
@@ -78,5 +79,6 @@ backend.sunsetAnalyzer.resources.lambda.addToRolePolicy(
 // datadog.addLambdaFunctions([
 //   backend.postConfirmation.resources.lambda as lambda.Function,
 //   backend.userEvents.resources.lambda as lambda.Function,
-//   backend.fanoutWorker.resources.lambda as lambda.Function
+//   backend.fanoutWorker.resources.lambda as lambda.Function,
+//   backend.sunsetAnalyzer.resources.lambda as lambda.Function
 // ]);
