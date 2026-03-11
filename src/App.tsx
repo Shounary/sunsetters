@@ -107,6 +107,8 @@ function App() {
         textInput: '',
         imageInput: null
     })
+    const [isPosting, setIsPosting] = useState<boolean>(false);
+    const [postSubmitError, setPostSubmitError] = useState<string | null>(null);
 
 
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
@@ -131,61 +133,78 @@ function App() {
         }));
     };
 
-    const handleUpload = (e: React.FormEvent) => {
-        e.preventDefault()
-        if (!postImageFile && newPost.textInput === '') return;
+    const onImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPostSubmitError(null); 
+        handlePostImageSelect(e);
+    };
 
-        // CREATE A POST
-        // Create a dud post
-        client.models.Post.create({
-            owner: user.userId,
-            content: newPost.textInput,
-            likes: []
-        }).then(async (post) => {
+    const onImageClear = () => {
+        setPostSubmitError(null);
+        clearPostImage();
+    };
+
+    const handleUpload = async (e: React.FormEvent) => {
+        e.preventDefault();
+        
+        if (!postImageFile || isPosting) return;
+
+        setIsPosting(true)
+        setPostSubmitError(null)
+
+        try {
+            const uploadResult = await uploadData({
+                path: `images/${user.userId}-${Date.now()}-${postImageFile.name}`,
+                data: postImageFile,
+                options: { contentType: postImageFile.type }
+            }).result;
+
+            console.log("Image uploaded: processing CV sunset image analysis...");
+
+            const { data: isSunset, errors } = await client.queries.sunsetAnalyzer({
+                imagePath: uploadResult.path
+            });
+
+            if (errors || !isSunset) {
+                console.log("Classified as NOT a sunset: resetting post image");
+                await remove({ path: uploadResult.path });
+                clearPostImage();
+                setPostSubmitError("This does not look like a sunset! Please try another one.");
+                return;
+                // The finally block will reset isPosting
+            }
+
+            console.log("Classified as a sunset: creating a post");
+
+            const post = await client.models.Post.create({
+                owner: user.userId,
+                content: newPost.textInput,
+                imagePath: uploadResult.path,
+                likes: []
+            });
+
             if (!post.data) {
                 console.warn("Post contains empty data!");
-                return
+                return;
             }
-            // console.log(`File ${file.name} selected`)
-            const postData = post.data
-            if (!postImageFile) {
-                console.log("The post included no media!")
-                return
-            }
+            const postData = post.data;
 
-            // Upload image to S3 storage
-            await uploadData({
-                path: `images/${post.data.id}-${postImageFile.name}`,
-                data: postImageFile,
-                options: {
-                    contentType: postImageFile.type
-                }
-            }).result.then((uploaded) => {
-                console.log(`Image ${uploaded.path} uploaded to storage`)
+            await client.models.UserPost.create({ postID: postData.id });
+            client.mutations.userEvent({
+                userEvent: UserEvent.ADD_POST_TO_FEED,
+                originUserID: user.userId,
+                newPostID: postData.id
+            });
 
-                // Update the dud post with S3 path
-                client.models.Post.update({
-                    id: postData.id,
-                    content: postData.content,
-                    imagePath: uploaded.path
-                }).then(() => {
-                    console.log(`Post for ${postImageFile.name} update with newly uploaded image ${uploaded.path}`)
-                })
-
-                client.models.UserPost.create({ postID: postData.id }).catch(() => {
-                    console.error(`Could not create a UserPost entry with postID: ${postData.id}`)
-                })
-
-                console.log("Calling client.mutations on frontend")
-                client.mutations.userEvent({ userEvent: UserEvent.ADD_POST_TO_FEED, originUserID: user.userId, newPostID: postData.id })
-
-
-                // Clear the text and reset the image hook
-                setNewPost({ textInput: '', imageInput: null })
-                clearPostImage();
-            })
-        })
+            setNewPost({ textInput: '', imageInput: null });
+            clearPostImage();
+        } catch (error) {
+            console.error("Error creating post:", error);
+            setPostSubmitError("Something went wrong while publishing your post. Please try again.");
+        } finally {
+            setIsPosting(false);
+        }
     }
+
 
     // CHANGE PROFILE IMAGE
     // Listen for when the hook successfully finishes processing a new profile image
@@ -483,23 +502,42 @@ function App() {
                                 onChange={handleNewPostTextChange} 
                                 placeholder="Have you seen a sunset?"
                                 className="text-input"
-                                required
+                                disabled={isPosting}    
                             />
                         </div>
 
                         {/* Surface hook validation errors to the user */}
                         {postImageError && <p style={{ color: 'red', fontSize: '0.9em', margin: '5px 0' }}>{postImageError}</p>}
+                        {/* Surface submission / AI validation errors to the user */}
+                        {postSubmitError && (
+                            <div className="error-banner">
+                                <svg 
+                                    className="error-icon" 
+                                    viewBox="0 0 24 24" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    strokeWidth="2" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                <span>{postSubmitError}</span>
+                            </div>
+                        )}
 
                         <div className="form-bottom-row">
                             <div className="media-section">
                                 <input 
                                     type="file" 
                                     name="imageInput" 
-                                    onChange={handlePostImageSelect} 
+                                    onChange={onImageSelect} 
                                     className="file-input"
                                     id="file-upload"
                                     accept="image/jpeg, image/png, image/webp, image/gif"
-                                    disabled={isPostImageProcessing}
+                                    disabled={isPostImageProcessing || isPosting} 
                                 />
 
                                 {isPostImageProcessing ? (
@@ -511,10 +549,9 @@ function App() {
                                             alignItems: 'center', 
                                             justifyContent: 'center', 
                                             gap: '8px',
-                                            color: '#666' // Matches standard secondary text
+                                            color: '#666'
                                         }}
                                     >
-                                        {/* Animated SVG Spinner */}
                                         <svg 
                                             width="28" 
                                             height="28" 
@@ -523,9 +560,7 @@ function App() {
                                             stroke="currentColor" 
                                             fill="none"
                                         >
-                                            {/* Faded background track */}
                                             <circle cx="12" cy="12" r="10" strokeWidth="3" stroke="rgba(0,0,0,0.1)" />
-                                            {/* Spinning active segment */}
                                             <path d="M12 2 a10 10 0 0 1 10 10" strokeWidth="3" strokeLinecap="round">
                                                 <animateTransform 
                                                     attributeName="transform" 
@@ -541,7 +576,7 @@ function App() {
                                 ) : postPreviewUrl ? (
                                     <div className="small-preview-wrapper">
                                         <img src={postPreviewUrl} alt="Upload Preview" className="small-image-preview" />
-                                        <button type="button" onClick={clearPostImage} className="small-clear-btn" aria-label="Remove image">
+                                        <button type="button" onClick={onImageClear} className="small-clear-btn" aria-label="Remove image">
                                             ✕
                                         </button>
                                     </div>
@@ -554,7 +589,39 @@ function App() {
                                     </label>
                                 )}
                             </div>
-                            <button type="submit" className="btn-primary" disabled={isPostImageProcessing}>Post</button>
+                            <button 
+                                type="submit" 
+                                className="btn-primary" 
+                                disabled={isPostImageProcessing || isPosting}
+                            >
+                                {isPosting ? (
+                                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                                        <svg 
+                                            width="18" 
+                                            height="18" 
+                                            viewBox="0 0 24 24" 
+                                            xmlns="http://www.w3.org/2000/svg" 
+                                            stroke="currentColor" 
+                                            fill="none"
+                                        >
+                                            <circle cx="12" cy="12" r="10" strokeWidth="3" stroke="rgba(255,255,255,0.3)" />
+                                            <path d="M12 2 a10 10 0 0 1 10 10" strokeWidth="3" strokeLinecap="round">
+                                                <animateTransform 
+                                                    attributeName="transform" 
+                                                    type="rotate" 
+                                                    from="0 12 12" 
+                                                    to="360 12 12" 
+                                                    dur="0.8s" 
+                                                    repeatCount="indefinite" 
+                                                />
+                                            </path>
+                                        </svg>
+                                        Posting...
+                                    </div>
+                                ) : (
+                                    "Post"
+                                )}
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -566,7 +633,6 @@ function App() {
                 />
             </div>
 
-            {/* 3. Scrollable Content Area */}
             <div className="main-content-scroll-area">
                 {renderContent()}
             </div>

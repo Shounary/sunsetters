@@ -9,6 +9,8 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 
 import { userEvents } from './functions/user-events/resource';
 import { fanoutWorker } from './functions/fanout-worker/resource';
+import { sunsetAnalyzer } from './functions/sunset-analyzer/resource';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
 
@@ -18,9 +20,11 @@ const backend = defineBackend({
   storage,
   userEvents,
   fanoutWorker,
-  postConfirmation
+  postConfirmation,
+  sunsetAnalyzer
 });
 
+// Fanout SNS setup
 const fanoutStack = backend.createStack('UserFanoutStack');
 
 const userEventsTopic = new sns.Topic(fanoutStack, 'UserEventsTopic');
@@ -37,26 +41,44 @@ userEventsTopic.addSubscription(
 );
 
 
-// Backend monitoring
-const monitoringStack = backend.createStack('DatadogMonitoringStack');
 
-const datadogSecret = Secret.fromSecretNameV2(
-  monitoringStack, 
-  'DDSecretLookup', 
-  'DatadogApiKey'
+// sunsetAnalyzer permissions
+backend.sunsetAnalyzer.addEnvironment(
+  'BUCKET_NAME',
+  backend.storage.resources.bucket.bucketName
 );
 
-const datadog = new DatadogLambda(monitoringStack, 'DatadogIntegration', {
-  nodeLayerVersion: 114, 
-  extensionLayerVersion: 61,
-  site: 'us3.datadoghq.com',
-  apiKeySecretArn: datadogSecret.secretArn, 
-  env: 'prod',
-  service: 'sunsetters-backend',
-})
+backend.storage.resources.bucket.grantRead(backend.sunsetAnalyzer.resources.lambda);
 
-datadog.addLambdaFunctions([
-  backend.postConfirmation.resources.lambda as lambda.Function,
-  backend.userEvents.resources.lambda as lambda.Function,
-  backend.fanoutWorker.resources.lambda as lambda.Function
-]);
+backend.sunsetAnalyzer.resources.lambda.addToRolePolicy(
+  new iam.PolicyStatement({
+    actions: ['rekognition:DetectLabels'],
+    resources: ['*'],
+  })
+);
+
+
+// Backend monitoring
+// const monitoringStack = backend.createStack('DatadogMonitoringStack');
+
+// const datadogSecret = Secret.fromSecretNameV2(
+//   monitoringStack, 
+//   'DDSecretLookup', 
+//   'DatadogApiKey'
+// );
+
+// const datadog = new DatadogLambda(monitoringStack, 'DatadogIntegration', {
+//   nodeLayerVersion: 114, 
+//   extensionLayerVersion: 61,
+//   site: 'us3.datadoghq.com',
+//   apiKeySecretArn: datadogSecret.secretArn, 
+//   env: 'prod',
+//   service: 'sunsetters-backend',
+// })
+
+// datadog.addLambdaFunctions([
+//   backend.postConfirmation.resources.lambda as lambda.Function,
+//   backend.userEvents.resources.lambda as lambda.Function,
+//   backend.fanoutWorker.resources.lambda as lambda.Function,
+//   backend.sunsetAnalyzer.resources.lambda as lambda.Function
+// ]);
