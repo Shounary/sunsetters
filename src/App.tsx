@@ -108,6 +108,7 @@ function App() {
         imageInput: null
     })
     const [isPosting, setIsPosting] = useState<boolean>(false);
+    const [postSubmitError, setPostSubmitError] = useState<string | null>(null);
 
 
     const [feedDisplay, setFeedDisplay] = useState<Array<PostDisplay>>([])
@@ -132,12 +133,23 @@ function App() {
         }));
     };
 
+    const onImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setPostSubmitError(null); 
+        handlePostImageSelect(e);
+    };
+
+    const onImageClear = () => {
+        setPostSubmitError(null);
+        clearPostImage();
+    };
+
     const handleUpload = async (e: React.FormEvent) => {
         e.preventDefault();
         
         if (!postImageFile || isPosting) return;
 
-        setIsPosting(true);
+        setIsPosting(true)
+        setPostSubmitError(null)
 
         try {
             const uploadResult = await uploadData({
@@ -156,7 +168,7 @@ function App() {
                 console.log("Classified as NOT a sunset: resetting post image");
                 await remove({ path: uploadResult.path });
                 clearPostImage();
-                alert("Beautiful image, but this does not look like a sunset! Please try another one.");
+                setPostSubmitError("This does not look like a sunset! Please try another one.");
                 return;
                 // The finally block will reset isPosting
             }
@@ -187,7 +199,7 @@ function App() {
             clearPostImage();
         } catch (error) {
             console.error("Error creating post:", error);
-            alert("Something went wrong while publishing your post. Please try again.");
+            setPostSubmitError("Something went wrong while publishing your post. Please try again.");
         } finally {
             setIsPosting(false);
         }
@@ -496,13 +508,32 @@ function App() {
 
                         {/* Surface hook validation errors to the user */}
                         {postImageError && <p style={{ color: 'red', fontSize: '0.9em', margin: '5px 0' }}>{postImageError}</p>}
+                        {/* Surface submission / AI validation errors to the user */}
+                        {postSubmitError && (
+                            <div className="error-banner">
+                                <svg 
+                                    className="error-icon" 
+                                    viewBox="0 0 24 24" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    strokeWidth="2" 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round"
+                                >
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                <span>{postSubmitError}</span>
+                            </div>
+                        )}
 
                         <div className="form-bottom-row">
                             <div className="media-section">
                                 <input 
                                     type="file" 
                                     name="imageInput" 
-                                    onChange={handlePostImageSelect} 
+                                    onChange={onImageSelect} 
                                     className="file-input"
                                     id="file-upload"
                                     accept="image/jpeg, image/png, image/webp, image/gif"
@@ -545,7 +576,7 @@ function App() {
                                 ) : postPreviewUrl ? (
                                     <div className="small-preview-wrapper">
                                         <img src={postPreviewUrl} alt="Upload Preview" className="small-image-preview" />
-                                        <button type="button" onClick={clearPostImage} className="small-clear-btn" aria-label="Remove image">
+                                        <button type="button" onClick={onImageClear} className="small-clear-btn" aria-label="Remove image">
                                             ✕
                                         </button>
                                     </div>

@@ -752,3 +752,25 @@ button {
 .avatar-upload-label:hover .avatar-hover-overlay {
   opacity: 1;
 }
+
+/* --- ERROR BANNER --- */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(171, 72, 72, 0.3);
+  color: #861c1c;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  animation: fadeInDown 0.3s ease-out;
+}
+
+.error-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
