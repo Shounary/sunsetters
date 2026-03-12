@@ -27,7 +27,7 @@ export const handler: Schema["checkRateLimit"]["functionHandler"] = async (event
         "PK": { S: partitionKey }
       },
       // Atomically add 1 to the 'requests' attribute
-      UpdateExpression: "ADD requests :one",
+      UpdateExpression: "ADD requests :one SET expireAt = :ttl",
       // Only succeed if it doesn't exist yet, OR if it's currently under the limit
       ConditionExpression: "attribute_not_exists(requests) OR requests < :maxLimit",
       ExpressionAttributeValues: {
