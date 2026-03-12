@@ -1,6 +1,7 @@
 // src/App.test.tsx
-import { render, screen } from '@testing-library/react';
 import { vi, describe, it, expect, beforeEach } from 'vitest';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { generateClient } from 'aws-amplify/data';
 import App from '../App';
 
 // MOCK AWS AMPLIFY AUTH
@@ -76,5 +77,26 @@ describe('SunSetters App Component', () => {
     expect(screen.getByPlaceholderText('Have you seen a sunset?')).toBeInTheDocument();
     
     expect(screen.getByRole('button', { name: 'Post' })).toBeInTheDocument();
+  });
+
+  it('updates the text input when a user types a caption', () => {
+    render(<App />);
+    
+    const input = screen.getByPlaceholderText('Have you seen a sunset?');
+
+    fireEvent.change(input, { target: { value: 'SFO' } });
+
+    expect(input).toHaveValue('SFO');
+  });
+
+  it('does not attempt to post if no image is attached', async () => {
+    const mockClient = generateClient() as any;
+    
+    render(<App />);
+    
+    const postButton = screen.getByRole('button', { name: 'Post' });
+    fireEvent.click(postButton);
+
+    expect(mockClient.mutations.checkRateLimit).not.toHaveBeenCalled();
   });
 });
