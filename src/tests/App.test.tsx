@@ -1,0 +1,80 @@
+// src/App.test.tsx
+import { render, screen } from '@testing-library/react';
+import { vi, describe, it, expect, beforeEach } from 'vitest';
+import App from '../App';
+
+// MOCK AWS AMPLIFY AUTH
+vi.mock('@aws-amplify/ui-react', () => ({
+  useAuthenticator: () => ({
+    user: { userId: 'mock-user-123' },
+    signOut: vi.fn(), // Creates a dummy function we can track
+  }),
+}));
+
+// MOCK AWS AMPLIFY STORAGE
+vi.mock('aws-amplify/storage', () => ({
+  getUrl: vi.fn().mockResolvedValue({ url: 'https://fake-image-url.com/sunset.jpg' }),
+  uploadData: vi.fn(),
+  remove: vi.fn(),
+}));
+
+// MOCK AWS AMPLIFY DATA (DynamoDB)
+vi.mock('aws-amplify/data', () => ({
+  generateClient: () => ({
+    models: {
+      UserPost: {
+        observeQuery: () => ({
+          subscribe: vi.fn(() => ({ unsubscribe: vi.fn() })),
+        }),
+        list: vi.fn().mockResolvedValue({ data: [] }),
+      },
+      UserProfile: {
+        observeQuery: () => ({
+          // When the component mounts, simulate an empty profile returning
+          subscribe: (callbacks: any) => {
+            callbacks.next({ items: [] });
+            return { unsubscribe: vi.fn() };
+          }
+        }),
+        list: vi.fn().mockResolvedValue({ data: [] }),
+      },
+      FeedPost: {
+        list: vi.fn().mockResolvedValue({ data: [] }),
+      },
+      Post: {
+        list: vi.fn().mockResolvedValue({ data: [] }),
+      }
+    },
+    queries: {
+      sunsetAnalyzer: vi.fn(),
+    },
+    mutations: {
+      checkRateLimit: vi.fn(),
+      userEvent: vi.fn(),
+    }
+  }),
+}));
+
+describe('SunSetters App Component', () => {
+  // Clear any mock history before each test runs
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('renders the main application header correctly', () => {
+    render(<App />);
+
+    expect(screen.getByText('Sun')).toBeInTheDocument();
+    expect(screen.getByText('Setters')).toBeInTheDocument();
+    
+    expect(screen.getByRole('button', { name: /Sign Out/i })).toBeInTheDocument();
+  });
+
+  it('renders the create post form', () => {
+    render(<App />);
+    
+    expect(screen.getByPlaceholderText('Have you seen a sunset?')).toBeInTheDocument();
+    
+    expect(screen.getByRole('button', { name: 'Post' })).toBeInTheDocument();
+  });
+});
