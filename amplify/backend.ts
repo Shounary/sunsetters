@@ -83,26 +83,27 @@ backend.rateLimiter.addEnvironment(
 
 
 // Backend monitoring
-// const monitoringStack = backend.createStack('DatadogMonitoringStack');
+const monitoringStack = backend.createStack('DatadogMonitoringStack');
 
-// const datadogSecret = Secret.fromSecretNameV2(
-//   monitoringStack, 
-//   'DDSecretLookup', 
-//   'DatadogApiKey'
-// );
+const datadogSecret = Secret.fromSecretNameV2(
+  monitoringStack, 
+  'DDSecretLookup', 
+  'DatadogApiKey'
+);
 
-// const datadog = new DatadogLambda(monitoringStack, 'DatadogIntegration', {
-//   nodeLayerVersion: 114, 
-//   extensionLayerVersion: 61,
-//   site: 'us3.datadoghq.com',
-//   apiKeySecretArn: datadogSecret.secretArn, 
-//   env: 'prod',
-//   service: 'sunsetters-backend',
-// })
+const datadog = new DatadogLambda(monitoringStack, 'DatadogIntegration', {
+  nodeLayerVersion: 114, 
+  extensionLayerVersion: 61,
+  site: 'us3.datadoghq.com',
+  apiKeySecretArn: datadogSecret.secretArn, 
+  env: 'prod',
+  service: 'sunsetters-backend',
+})
 
-// datadog.addLambdaFunctions([
-//   backend.postConfirmation.resources.lambda as lambda.Function,
-//   backend.userEvents.resources.lambda as lambda.Function,
-//   backend.fanoutWorker.resources.lambda as lambda.Function,
-//   backend.sunsetAnalyzer.resources.lambda as lambda.Function
-// ]);
+datadog.addLambdaFunctions([
+  backend.postConfirmation.resources.lambda as lambda.Function,
+  backend.userEvents.resources.lambda as lambda.Function,
+  backend.fanoutWorker.resources.lambda as lambda.Function,
+  backend.sunsetAnalyzer.resources.lambda as lambda.Function,
+  backend.rateLimiter.resources.lambda as lambda.Function
+]);
