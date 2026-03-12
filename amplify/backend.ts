@@ -1,4 +1,6 @@
 import { defineBackend } from '@aws-amplify/backend';
+import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as cdk from 'aws-cdk-lib/core';
 import { auth } from './auth/resource';
 import { data } from './data/resource';
 import { storage } from './storage/resource';
@@ -10,6 +12,7 @@ import { Secret } from 'aws-cdk-lib/aws-secretsmanager';
 import { userEvents } from './functions/user-events/resource';
 import { fanoutWorker } from './functions/fanout-worker/resource';
 import { sunsetAnalyzer } from './functions/sunset-analyzer/resource';
+import { rateLimiter } from './functions/rate-limiter/resource';
 import * as iam from 'aws-cdk-lib/aws-iam';
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subs from 'aws-cdk-lib/aws-sns-subscriptions';
@@ -21,8 +24,10 @@ const backend = defineBackend({
   userEvents,
   fanoutWorker,
   postConfirmation,
-  sunsetAnalyzer
+  sunsetAnalyzer,
+  rateLimiter
 });
+
 
 // Fanout SNS setup
 const fanoutStack = backend.createStack('UserFanoutStack');
@@ -41,7 +46,6 @@ userEventsTopic.addSubscription(
 );
 
 
-
 // sunsetAnalyzer permissions
 backend.sunsetAnalyzer.addEnvironment(
   'BUCKET_NAME',
@@ -55,6 +59,26 @@ backend.sunsetAnalyzer.resources.lambda.addToRolePolicy(
     actions: ['rekognition:DetectLabels'],
     resources: ['*'],
   })
+);
+
+
+// rateLimiter setup
+const rateLimitTable = new dynamodb.Table(
+  backend.createStack('RateLimitStack'), 
+  'DailyRateLimits', 
+  {
+    partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
+    billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    removalPolicy: cdk.RemovalPolicy.DESTROY, 
+    timeToLiveAttribute: 'expireAt' 
+  }
+);
+
+rateLimitTable.grantReadWriteData(backend.rateLimiter.resources.lambda);
+
+backend.rateLimiter.addEnvironment(
+  'RATE_LIMIT_TABLE',
+  rateLimitTable.tableName
 );
 
 

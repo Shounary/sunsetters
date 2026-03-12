@@ -152,6 +152,14 @@ function App() {
         setPostSubmitError(null)
 
         try {
+
+            const { data: canPost, errors: limitErrors } = await client.mutations.checkRateLimit();
+            
+            if (limitErrors || !canPost) {
+                setPostSubmitError("You've reached your hourly rate limit of 5 sunset attempts.");
+                return;
+            }
+
             const uploadResult = await uploadData({
                 path: `images/${user.userId}-${Date.now()}-${postImageFile.name}`,
                 data: postImageFile,

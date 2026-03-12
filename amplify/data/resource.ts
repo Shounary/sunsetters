@@ -3,6 +3,7 @@ import { postConfirmation } from '../auth/post-confirmation/resource';
 import { userEvents } from '../functions/user-events/resource'
 import { fanoutWorker } from "../functions/fanout-worker/resource";
 import { sunsetAnalyzer } from "../functions/sunset-analyzer/resource";
+import { rateLimiter } from "../functions/rate-limiter/resource";
 
 
 const schema = a.schema({
@@ -14,7 +15,7 @@ const schema = a.schema({
     imagePath: a.string(),
     likes: a.string().required().array().required()
   })
-  .authorization((allow) => [allow.authenticated()]),
+    .authorization((allow) => [allow.authenticated()]),
   
 
   UserProfile: a
@@ -26,7 +27,7 @@ const schema = a.schema({
     followers: a.string().required().array().required(),
     follows: a.string().required().array().required()
   })
-  .authorization((allow) => [allow.authenticated()]),
+    .authorization((allow) => [allow.authenticated()]),
 
   FeedPost: a.
   model({
@@ -34,24 +35,29 @@ const schema = a.schema({
     owner: a.string().required(),
     wasViewed: a.boolean().default(false)
   })
-  .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
 
   UserPost: a.
   model({
     postID: a.string().required()
   })
-  .authorization((allow) => [allow.owner()]),
+    .authorization((allow) => [allow.owner()]),
 
   userEvent: a.mutation()
-  .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
-  .handler(a.handler.function(userEvents))
-  .returns(a.boolean()),
+    .arguments({ userEvent: a.string().required(), originUserID: a.string(), targetUserID: a.string(), newPostID: a.string() })
+    .handler(a.handler.function(userEvents))
+    .returns(a.boolean()),
+
+  checkRateLimit: a.mutation()
+    .returns(a.boolean())
+    .handler(a.handler.function(rateLimiter))
+    .authorization(allow => [allow.authenticated()]),
 
   sunsetAnalyzer: a.query()
-  .arguments({ imagePath: a.string().required() })
-  .returns(a.boolean())
-  .handler(a.handler.function(sunsetAnalyzer))
-  .authorization(allow => [allow.authenticated()]),
+    .arguments({ imagePath: a.string().required() })
+    .returns(a.boolean())
+    .handler(a.handler.function(sunsetAnalyzer))
+    .authorization(allow => [allow.authenticated()]),
 })
 
 .authorization(allow => [
