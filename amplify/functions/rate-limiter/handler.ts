@@ -2,7 +2,7 @@ import { DynamoDBClient, UpdateItemCommand, ConditionalCheckFailedException } fr
 import type { Schema } from "../../data/resource";
 
 const dynamodb = new DynamoDBClient();
-const MAX_POSTS_PER_DAY = "5"; 
+const MAX_POSTS_PER_HOUR = "5"
 
 export const handler: Schema["checkRateLimit"]["functionHandler"] = async (event) => {
   const identity = event.identity as { sub?: string } | undefined;
@@ -13,8 +13,12 @@ export const handler: Schema["checkRateLimit"]["functionHandler"] = async (event
   if (!tableName) throw new Error("RATE_LIMIT_TABLE missing");
 
   // Create a partition key based on the user ID and the current date (YYYY-MM-DD)
-  const today = new Date().toISOString().split('T')[0];
-  const partitionKey = `${userId}#${today}`;
+  const now = new Date().toISOString()
+  const currentHour = now.substring(0, 13)
+  const partitionKey = `${userId}#${currentHour}`
+
+  // Calculate TTL: now + 2 hours
+  const expireAtSeconds = Math.floor(Date.now() / 1000) + (2 * 60 * 60);
 
   try {
     const command = new UpdateItemCommand({
@@ -28,7 +32,8 @@ export const handler: Schema["checkRateLimit"]["functionHandler"] = async (event
       ConditionExpression: "attribute_not_exists(requests) OR requests < :maxLimit",
       ExpressionAttributeValues: {
         ":one": { N: "1" },
-        ":maxLimit": { N: MAX_POSTS_PER_DAY }
+        ":maxLimit": { N: MAX_POSTS_PER_HOUR },
+        ":ttl": { N: expireAtSeconds.toString() }
       },
       ReturnValues: "UPDATED_NEW"
     });
